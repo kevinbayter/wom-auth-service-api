@@ -33,22 +33,22 @@ public class AuthService {
         Optional<User> userOpt = userService.findByEmailOrUsername(identifier);
         
         if (userOpt.isEmpty()) {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new InvalidCredentialsException("Invalid credentials");
         }
 
         User user = userOpt.get();
 
         if (userService.isAccountLocked(user)) {
-            throw new IllegalStateException("Account is locked");
+            throw new AccountLockedException("Account is locked", user.getLockedUntil());
         }
 
         if (!userService.isAccountActive(user)) {
-            throw new IllegalStateException("Account is not active");
+            throw new InvalidCredentialsException("Account is not active");
         }
 
         if (!userService.validatePassword(password, user.getPasswordHash())) {
             userService.incrementFailedAttempts(user);
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new InvalidCredentialsException("Invalid credentials");
         }
 
         userService.resetFailedAttempts(user);
