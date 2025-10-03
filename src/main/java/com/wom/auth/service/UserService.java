@@ -2,6 +2,7 @@ package com.wom.auth.service;
 
 import com.wom.auth.entity.User;
 import com.wom.auth.repository.jpa.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import java.util.Optional;
 /**
  * Service for user management operations.
  */
+@Slf4j
 @Service
 public class UserService {
 
@@ -40,7 +42,10 @@ public class UserService {
     }
 
     public boolean validatePassword(String rawPassword, String encodedPassword) {
-        return passwordEncoder.matches(rawPassword, encodedPassword);
+        boolean matches = passwordEncoder.matches(rawPassword, encodedPassword);
+        log.debug("Password validation - Raw: [{}], Encoded: [{}], Matches: {}", 
+                  rawPassword, encodedPassword, matches);
+        return matches;
     }
 
     @Transactional
