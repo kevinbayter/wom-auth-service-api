@@ -8,8 +8,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * Repository for managing rate limiting data in Redis.
  * Implements token bucket algorithm for rate limiting.
- *
- * @author Kevin Bayter
  */
 @Repository
 public class RateLimitRepository {

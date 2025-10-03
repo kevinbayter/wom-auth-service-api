@@ -12,8 +12,6 @@ import java.time.LocalDateTime;
 
 /**
  * RefreshToken entity for managing token rotation and revocation.
- *
- * @author Kevin Bayter
  */
 @Entity
 @Table(name = "refresh_tokens")

@@ -11,8 +11,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
  * Redis configuration for token storage and rate limiting.
- *
- * @author Kevin Bayter
  */
 @Configuration
 public class RedisConfig {

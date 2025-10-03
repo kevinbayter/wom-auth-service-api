@@ -8,8 +8,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * Repository for managing token blacklist in Redis.
  * Used to invalidate JWT access tokens before their natural expiration.
- *
- * @author Kevin Bayter
  */
 @Repository
 public class TokenBlacklistRepository {

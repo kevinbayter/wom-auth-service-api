@@ -16,8 +16,6 @@ import java.time.LocalDateTime;
 
 /**
  * User entity representing an authenticated user in the system.
- *
- * @author Kevin Bayter
  */
 @Entity
 @Table(name = "users")

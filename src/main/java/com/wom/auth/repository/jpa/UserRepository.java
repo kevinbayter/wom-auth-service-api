@@ -9,8 +9,6 @@ import java.util.Optional;
 
 /**
  * Repository for User entity data access operations.
- *
- * @author Kevin Bayter
  */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {

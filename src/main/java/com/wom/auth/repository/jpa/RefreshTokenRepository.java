@@ -12,8 +12,6 @@ import java.util.Optional;
 
 /**
  * Repository for RefreshToken entity data access operations.
- *
- * @author Kevin Bayter
  */
 @Repository
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
