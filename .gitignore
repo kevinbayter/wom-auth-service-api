@@ -1,0 +1,69 @@
+# Compilados
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.settings/
+.classpath
+.project
+.factorypath
+
+# Configuración local
+application-local.yml
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# Claves privadas (NUNCA commitear)
+*.pem
+*.key
+*.p12
+*.jks
+src/main/resources/keys/private_key.pem
+
+# Tests
+test-output/
+*.class
+
+# Coverage
+.jacoco/
+jacoco.exec
+
+# Temporal
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*~
+
+# Docker
+docker/volumes/
+
+# Spring Boot
+spring-boot-devtools.properties
+
+# Documentación de gestión del proyecto (no parte del código)
+PLAN_DESARROLLO.md
+REGLAS.md
+PROGRESO.md
+instrucciones_prueba.txt

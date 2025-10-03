@@ -1,0 +1,44 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  # Base de datos local con Docker
+  datasource:
+    url: jdbc:postgresql://localhost:5432/wom_auth_db
+    username: wom_user
+    password: wom_password
+
+  # Redis local con Docker
+  redis:
+    host: localhost
+    port: 6379
+    password: ""
+
+  # JPA - Mostrar SQL en desarrollo
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+# JWT - Tiempos más cortos para testing
+jwt:
+  expiration:
+    access-token: 900000    # 15 minutos
+    refresh-token: 604800000 # 7 días
+
+# Logging detallado en desarrollo
+logging:
+  level:
+    root: INFO
+    com.wom.auth: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# Actuator - Mostrar todos los detalles
+management:
+  endpoint:
+    health:
+      show-details: always

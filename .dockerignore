@@ -1,0 +1,28 @@
+# .dockerignore
+# Evitar copiar archivos innecesarios al contexto de Docker
+
+target/
+.git/
+.gitignore
+.idea/
+.vscode/
+*.iml
+*.md
+.env
+.env.example
+docker-compose.yml
+Dockerfile
+README.md
+PLAN_DESARROLLO.md
+REGLAS.md
+instrucciones_prueba.txt
+
+# Logs
+logs/
+*.log
+
+# Tests
+src/test/
+
+# Documentation
+docs/

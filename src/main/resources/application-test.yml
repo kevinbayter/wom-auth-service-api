@@ -1,0 +1,46 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  # H2 en memoria para tests rápidos
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  # JPA para H2
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: false
+    hibernate:
+      ddl-auto: create-drop
+
+  # Flyway deshabilitado en tests (usamos ddl-auto)
+  flyway:
+    enabled: false
+
+  # Redis embebido para tests
+  redis:
+    host: localhost
+    port: 6370
+
+# JWT - Tokens de corta duración para tests
+jwt:
+  expiration:
+    access-token: 60000     # 1 minuto
+    refresh-token: 300000   # 5 minutos
+
+# Logging mínimo en tests
+logging:
+  level:
+    root: WARN
+    com.wom.auth: INFO
+    org.springframework: WARN
+    org.hibernate: WARN
+
+# Actuator deshabilitado en tests
+management:
+  endpoints:
+    enabled-by-default: false
