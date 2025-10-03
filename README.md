@@ -62,7 +62,39 @@ Servicio de autenticación empresarial con JWT, refresh tokens, rate limiting y 
 - **Docker & Docker Compose**
 - **GitHub Actions** (CI/CD)
 
-## 🏗️ Arquitectura
+## 🏗️ Architecture
+
+### System Context Diagram (C4 Level 1)
+
+High-level view of the authentication service and its external dependencies:
+
+![System Context Diagram](docs/diagrams/C4_Context.png)
+
+### Container Diagram (C4 Level 2)
+
+Internal structure showing services, controllers, and data stores:
+
+![Container Diagram](docs/diagrams/C4_Container.png)
+
+### Component Architecture
+
+Detailed component architecture following SOLID principles:
+
+![Component Architecture](docs/diagrams/Component_Architecture.png)
+
+### Authentication Flow
+
+Sequence diagram showing the complete login process:
+
+![Authentication Flow](docs/diagrams/Authentication_Flow.png)
+
+### Refresh Token Flow
+
+Sequence diagram showing token rotation mechanism:
+
+![Refresh Token Flow](docs/diagrams/Refresh_Token_Flow.png)
+
+### Architecture Principles
 
 ```
 ┌─────────────────┐
@@ -83,16 +115,16 @@ Servicio de autenticación empresarial con JWT, refresh tokens, rate limiting y 
 ┌─────────────────────────────────────┐
 │       Service Layer (SOLID)         │
 ├─────────────────────────────────────┤
-│  - AuthService (orquestación)       │
-│  - UserService (lógica de usuario)  │
-│  - JwtService  (tokens JWT)         │
+│  - AuthService (orchestration)      │
+│  - UserService (user logic)         │
+│  - JwtService  (JWT tokens)         │
 │  - TokenService (refresh tokens)    │
 └────────┬────────────────────────────┘
          │
          ▼
 ┌──────────────┐    ┌──────────────┐
 │  PostgreSQL  │    │    Redis     │
-│   (Usuarios) │    │   (Tokens)   │
+│   (Users)    │    │   (Tokens)   │
 └──────────────┘    └──────────────┘
 ```
 
