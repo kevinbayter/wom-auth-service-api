@@ -1,12 +1,12 @@
 package com.wom.auth.service;
 
+import com.wom.auth.dto.LoginResponse;
 import com.wom.auth.entity.RefreshToken;
 import com.wom.auth.entity.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -19,6 +19,9 @@ public class AuthService {
     private final JwtService jwtService;
     private final TokenService tokenService;
 
+    @Value("${jwt.access-token-expiration}")
+    private Long accessTokenExpiration;
+
     public AuthService(UserService userService, JwtService jwtService, TokenService tokenService) {
         this.userService = userService;
         this.jwtService = jwtService;
@@ -26,7 +29,7 @@ public class AuthService {
     }
 
     @Transactional
-    public Map<String, Object> authenticate(String identifier, String password) {
+    public LoginResponse authenticate(String identifier, String password) {
         Optional<User> userOpt = userService.findByEmailOrUsername(identifier);
         
         if (userOpt.isEmpty()) {
@@ -56,23 +59,16 @@ public class AuthService {
         
         tokenService.createRefreshToken(user.getId(), refreshToken);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("accessToken", accessToken);
-        response.put("refreshToken", refreshToken);
-        response.put("tokenType", "Bearer");
-        response.put("expiresIn", 900);
-        response.put("user", Map.of(
-                "id", user.getId(),
-                "email", user.getEmail(),
-                "username", user.getUsername(),
-                "fullName", user.getFullName()
-        ));
-
-        return response;
+        return LoginResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .expiresIn(accessTokenExpiration / 1000)
+                .build();
     }
 
     @Transactional
-    public Map<String, Object> refreshAccessToken(String refreshToken) {
+    public LoginResponse refreshAccessToken(String refreshToken) {
         Optional<RefreshToken> validToken = tokenService.validateRefreshToken(refreshToken);
         
         if (validToken.isEmpty()) {
@@ -103,34 +99,43 @@ public class AuthService {
         String newAccessToken = jwtService.generateAccessToken(user.getId(), user.getUsername(), user.getEmail());
         String newRefreshToken = jwtService.generateRefreshToken(user.getId(), user.getUsername());
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("accessToken", newAccessToken);
-        response.put("refreshToken", newRefreshToken);
-        response.put("tokenType", "Bearer");
-        response.put("expiresIn", 900);
-
-        return response;
+        return LoginResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .tokenType("Bearer")
+                .expiresIn(accessTokenExpiration / 1000)
+                .build();
     }
 
     @Transactional
-    public void logout(String accessToken, String refreshToken) {
-        if (refreshToken != null && !refreshToken.isEmpty()) {
-            tokenService.revokeRefreshToken(refreshToken);
-        }
-
+    public void logout(String accessToken) {
         if (accessToken != null && !accessToken.isEmpty()) {
             try {
                 if (!jwtService.isTokenExpired(accessToken)) {
-                    long ttl = 900;
+                    long ttl = accessTokenExpiration / 1000;
                     tokenService.blacklistAccessToken(accessToken, ttl);
                 }
+                
+                Long userId = jwtService.getUserIdFromToken(accessToken);
+                String username = jwtService.getUsernameFromToken(accessToken);
+                String refreshToken = jwtService.generateRefreshToken(userId, username);
+                tokenService.revokeRefreshToken(refreshToken);
             } catch (Exception e) {
             }
         }
     }
 
     @Transactional
-    public void logoutAllDevices(Long userId) {
-        tokenService.revokeAllUserTokens(userId);
+    public void logoutAllDevices(String accessToken) {
+        try {
+            Long userId = jwtService.getUserIdFromToken(accessToken);
+            tokenService.revokeAllUserTokens(userId);
+            
+            if (!jwtService.isTokenExpired(accessToken)) {
+                long ttl = accessTokenExpiration / 1000;
+                tokenService.blacklistAccessToken(accessToken, ttl);
+            }
+        } catch (Exception e) {
+        }
     }
 }
