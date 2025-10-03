@@ -45,6 +45,10 @@ public class User {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
+    @Size(max = 100)
+    @Column(name = "full_name", length = 100)
+    private String fullName;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default
