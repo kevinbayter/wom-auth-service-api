@@ -90,18 +90,16 @@ public class AuthService {
         }
 
         User user = userOpt.get();
-        
-        Optional<RefreshToken> newTokenOpt = tokenService.rotateRefreshToken(refreshToken);
-        if (newTokenOpt.isEmpty()) {
-            throw new IllegalArgumentException("Token rotation failed");
-        }
 
         String newAccessToken = jwtService.generateAccessToken(user.getId(), user.getUsername(), user.getEmail());
-        String newRefreshToken = jwtService.generateRefreshToken(user.getId(), user.getUsername());
+        String newRefreshTokenJwt = jwtService.generateRefreshToken(user.getId(), user.getUsername());
+        
+        tokenService.revokeRefreshToken(refreshToken);
+        tokenService.createRefreshToken(user.getId(), newRefreshTokenJwt);
 
         return LoginResponse.builder()
                 .accessToken(newAccessToken)
-                .refreshToken(newRefreshToken)
+                .refreshToken(newRefreshTokenJwt)
                 .tokenType("Bearer")
                 .expiresIn(accessTokenExpiration / 1000)
                 .build();
