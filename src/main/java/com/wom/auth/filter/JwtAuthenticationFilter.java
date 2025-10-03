@@ -1,11 +1,14 @@
 package com.wom.auth.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wom.auth.exception.InvalidTokenException;
 import com.wom.auth.exception.TokenExpiredException;
 import com.wom.auth.service.JwtService;
 import com.wom.auth.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +23,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -29,6 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final TokenService tokenService;
     private final UserDetailsService userDetailsService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void doFilterInternal(
@@ -47,13 +54,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String jwt = authHeader.substring(7);
 
             if (tokenService.isTokenBlacklisted(jwt)) {
-                throw new InvalidTokenException("Token has been revoked");
+                handleAuthenticationException(response, request, "Token has been revoked");
+                return;
             }
 
             jwtService.validateToken(jwt);
 
             if (jwtService.isTokenExpired(jwt)) {
-                throw new TokenExpiredException("Token has expired");
+                handleAuthenticationException(response, request, "Token has expired");
+                return;
             }
 
             final String username = jwtService.getUsernameFromToken(jwt);
@@ -72,9 +81,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
 
+        } catch (TokenExpiredException ex) {
+            handleAuthenticationException(response, request, "Token has expired");
+        } catch (InvalidTokenException ex) {
+            handleAuthenticationException(response, request, ex.getMessage());
         } catch (Exception ex) {
             log.error("JWT authentication failed", ex);
-            throw ex;
+            handleAuthenticationException(response, request, "Invalid token");
         }
+    }
+
+    private void handleAuthenticationException(
+            HttpServletResponse response,
+            HttpServletRequest request,
+            String message) throws IOException {
+        
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+        Map<String, Object> errorDetails = new HashMap<>();
+        errorDetails.put("timestamp", LocalDateTime.now());
+        errorDetails.put("status", HttpStatus.UNAUTHORIZED.value());
+        errorDetails.put("error", HttpStatus.UNAUTHORIZED.getReasonPhrase());
+        errorDetails.put("message", message);
+        errorDetails.put("path", request.getRequestURI());
+
+        objectMapper.writeValue(response.getWriter(), errorDetails);
     }
 }
