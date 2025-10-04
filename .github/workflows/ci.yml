@@ -90,6 +90,9 @@ jobs:
       - name: Generate JaCoCo coverage report
         run: ./mvnw jacoco:report
 
+      - name: Check code coverage (minimum 80%)
+        run: ./mvnw jacoco:check
+
       - name: SonarQube Scan
         continue-on-error: true
         env:
@@ -104,10 +107,6 @@ jobs:
           else
             echo "SonarQube token not configured, skipping scan"
           fi
-
-      - name: Check code coverage
-        continue-on-error: true
-        run: ./mvnw jacoco:check
 
       - name: OWASP Dependency Check
         if: env.NVD_API_KEY != ''
