@@ -33,7 +33,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .antMatchers("/auth/login", "/auth/refresh").permitAll()
                 .antMatchers("/actuator/**").permitAll()
-                .antMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .antMatchers(
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**",
+                        "/swagger-resources/**",
+                        "/webjars/**"
+                ).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
