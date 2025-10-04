@@ -1,6 +1,7 @@
 package com.wom.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.wom.auth.exception.InvalidTokenException;
 import com.wom.auth.exception.TokenExpiredException;
 import com.wom.auth.service.JwtService;
@@ -35,7 +36,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final TokenService tokenService;
     private final UserDetailsService userDetailsService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
+
+    public JwtAuthenticationFilter(JwtService jwtService, TokenService tokenService, UserDetailsService userDetailsService) {
+        this.jwtService = jwtService;
+        this.tokenService = tokenService;
+        this.userDetailsService = userDetailsService;
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new JavaTimeModule());
+    }
 
     @Override
     protected void doFilterInternal(
