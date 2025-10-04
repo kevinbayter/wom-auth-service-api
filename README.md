@@ -1706,7 +1706,7 @@ wom-auth-service-api/
 
 ## 🚦 Roadmap
 
-### Fase 1: [x] Completada
+### Fase: [x] Completada
 - [x] Autenticación JWT con RS256
 - [x] Refresh tokens con rotación
 - [x] Rate limiting
@@ -1807,8 +1807,8 @@ Software Engineer
 
 - 💼 **LinkedIn**: [linkedin.com/in/kevinbayter](https://www.linkedin.com/in/bayterx)
 - 🐙 **GitHub**: [@kevinbayter](https://github.com/kevinbayter)
-- 📧 **Email**: [kevin.bayter@example.com](mailto:kevinbayter@gmail.com)
-- 🌐 **Portfolio**: [kevinbayter.dev](https://bayterx.com)
+- 📧 **Email**: [kevinbayter@gmail.com](mailto:kevinbayter@gmail.com)
+- 🌐 **Portfolio**: [bayterx.com](https://bayterx.com)
 
 ---
 
