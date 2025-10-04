@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 public class RedisHealthIndicator implements HealthIndicator {
 
     private static final String PING_RESPONSE = "PONG";
-    private static final int TIMEOUT_MS = 3000;
     
     private final RedisTemplate<String, Object> redisTemplate;
 

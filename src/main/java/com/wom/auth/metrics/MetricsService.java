@@ -31,11 +31,8 @@ public class MetricsService {
     
     private final Timer loginTimer;
     private final Timer refreshTimer;
-    
-    private final MeterRegistry meterRegistry;
 
     public MetricsService(MeterRegistry meterRegistry) {
-        this.meterRegistry = meterRegistry;
         
         // Initialize counters
         this.loginSuccessCounter = Counter.builder(METRIC_PREFIX + ".login.success")
