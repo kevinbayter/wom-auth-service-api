@@ -10,9 +10,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for RedisConfig.
- * 
- * @author Kevin Bayter
- * @see <a href="https://github.com/kevinbayter">GitHub Profile</a>
  */
 class RedisConfigTest {
 

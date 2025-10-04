@@ -16,9 +16,6 @@ import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for TokenBlacklistRepository.
- * 
- * @author Kevin Bayter
- * @see <a href="https://github.com/kevinbayter">GitHub Profile</a>
  */
 @ExtendWith(MockitoExtension.class)
 class TokenBlacklistRepositoryTest {

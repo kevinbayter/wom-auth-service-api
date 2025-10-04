@@ -66,9 +66,15 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException ex, WebRequest request) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
+            if (error instanceof FieldError) {
+                String fieldName = ((FieldError) error).getField();
+                String errorMessage = error.getDefaultMessage();
+                errors.put(fieldName, errorMessage);
+            } else {
+                // Handle ObjectError (class-level constraints)
+                String errorMessage = error.getDefaultMessage();
+                errors.put(error.getObjectName(), errorMessage);
+            }
         });
         
         Map<String, Object> response = buildErrorMap(HttpStatus.BAD_REQUEST, "Validation failed", request);
