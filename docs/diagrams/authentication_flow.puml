@@ -1,0 +1,80 @@
+@startuml Authentication_Flow
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam sequenceMessageAlign center
+
+title Flujo de Autenticación - Login
+
+actor "Usuario" as user
+participant "Angular\nClient" as client
+participant "Auth\nController" as controller
+participant "Auth\nService" as authService
+participant "User\nService" as userService
+participant "JWT\nService" as jwtService
+participant "Token\nService" as tokenService
+database "PostgreSQL" as db
+database "Redis" as redis
+
+user -> client : Ingresa credenciales
+activate client
+
+client -> controller : POST /auth/login\n{identifier, password}
+activate controller
+
+controller -> authService : authenticate(request)
+activate authService
+
+authService -> userService : findByEmailOrUsername(identifier)
+activate userService
+userService -> db : SELECT * FROM users\nWHERE email = ? OR username = ?
+db --> userService : User data
+deactivate userService
+
+authService -> authService : Verificar contraseña\n(BCrypt.matches)
+
+alt Credenciales válidas
+    authService -> jwtService : generateAccessToken(user)
+    activate jwtService
+    jwtService --> authService : accessToken (15 min)
+    deactivate jwtService
+    
+    authService -> tokenService : createRefreshToken(user)
+    activate tokenService
+    tokenService -> db : INSERT INTO refresh_tokens
+    db --> tokenService : Token guardado
+    tokenService -> jwtService : generateRefreshToken(user)
+    jwtService --> tokenService : refreshToken (7 días)
+    tokenService --> authService : refreshToken
+    deactivate tokenService
+    
+    authService -> userService : updateLastLogin(user)
+    userService -> db : UPDATE users SET last_login_at = NOW()
+    
+    authService --> controller : LoginResponse\n{accessToken, refreshToken}
+    deactivate authService
+    
+    controller --> client : 200 OK\n{accessToken, refreshToken, expiresIn}
+    deactivate controller
+    
+    client -> client : Guardar tokens\nen localStorage/Cookie
+    client --> user : Login exitoso
+    
+else Credenciales inválidas
+    authService -> userService : incrementFailedAttempts(user)
+    userService -> db : UPDATE users\nSET failed_attempts = failed_attempts + 1
+    
+    alt 5 intentos fallidos
+        userService -> db : UPDATE users\nSET status = 'LOCKED'
+        authService --> controller : AccountLockedException
+        controller --> client : 403 Forbidden\n"Account locked"
+    else Menos de 5 intentos
+        authService --> controller : BadCredentialsException
+        controller --> client : 401 Unauthorized\n"Invalid credentials"
+    end
+    
+    client --> user : Error de autenticación
+end
+
+deactivate client
+
+@enduml

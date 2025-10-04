@@ -15,30 +15,31 @@
 ## 📋 Índice
 
 1. [Descripción General](#-descripción-general)
-2. [Características Principales](#-características-principales)
-3. [Stack Tecnológico](#️-stack-tecnológico)
-4. [Arquitectura](#️-arquitectura)
+2. [Quick Start](#-quick-start)
+3. [Características Principales](#-características-principales)
+4. [Instalación y Ejecución](#-instalación-y-ejecución)
+   - [Opción 1: Docker Compose (Recomendado)](#opción-1-docker-compose-recomendado)
+   - [Opción 2: Ejecución Local](#opción-2-ejecución-local)
+5. [Stack Tecnológico](#️-stack-tecnológico)
+6. [Arquitectura](#️-arquitectura)
    - [Diagrama de Arquitectura](#diagrama-de-arquitectura)
    - [Patrones de Diseño](#patrones-de-diseño)
    - [Principios SOLID](#principios-solid)
-5. [Requisitos Previos](#-requisitos-previos)
-6. [Instalación y Ejecución](#-instalación-y-ejecución)
-   - [Opción 1: Docker Compose (Recomendado)](#opción-1-docker-compose-recomendado)
-   - [Opción 2: Ejecución Local](#opción-2-ejecución-local)
-7. [Configuración](#️-configuración)
-8. [API Endpoints](#-api-endpoints)
+7. [Requisitos Previos](#-requisitos-previos)
+8. [Configuración](#️-configuración)
+9. [API Endpoints](#-api-endpoints)
    - [Autenticación](#autenticación)
    - [Ejemplos de Uso con cURL](#ejemplos-de-uso-con-curl)
-9. [Documentación Swagger](#-documentación-swagger)
-10. [Testing](#-testing)
-11. [Monitoreo y Métricas](#-monitoreo-y-métricas)
-12. [Seguridad](#-seguridad)
-13. [CI/CD](#-cicd)
-14. [Estructura del Proyecto](#-estructura-del-proyecto)
-15. [Roadmap](#-roadmap)
-16. [Contribución](#-contribución)
-17. [Licencia](#-licencia)
-18. [Contacto](#-contacto)
+10. [Documentación Swagger](#-documentación-swagger)
+11. [Testing](#-testing)
+12. [Monitoreo y Métricas](#-monitoreo-y-métricas)
+13. [Seguridad](#-seguridad)
+14. [CI/CD](#-cicd)
+15. [Estructura del Proyecto](#-estructura-del-proyecto)
+16. [Roadmap](#-roadmap)
+17. [Contribución](#-contribución)
+18. [Licencia](#-licencia)
+19. [Contacto](#-contacto)
 
 ---
 
@@ -57,6 +58,32 @@ Este proyecto fue desarrollado como prueba técnica para demostrar capacidades d
 - [x] **Observabilidad** (Métricas Prometheus, Health Checks)
 - [x] **DevOps** (Docker, CI/CD, Automatización)
 - [x] **Documentación completa** (Swagger, JavaDoc, README profesional)
+
+---
+
+## ⚡ Quick Start
+
+```bash
+# 1. Clonar repositorio
+git clone https://github.com/kevinbayter/wom-auth-service-api.git
+cd wom-auth-service-api
+
+# 2. Levantar con Docker
+docker-compose up -d --build
+
+# 3. Verificar salud
+curl http://localhost:8080/actuator/health
+
+# 4. Abrir Swagger
+open http://localhost:8080/swagger-ui/index.html
+
+# 5. Login de prueba
+curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"identifier": "admin@test.com", "password": "password"}'
+
+# ¡Listo! 🎉
+```
 
 ---
 
@@ -135,6 +162,133 @@ Este proyecto fue desarrollado como prueba técnica para demostrar capacidades d
 ### DevOps
 - **Docker & Docker Compose 3.8**
 - **GitHub Actions** (CI/CD)
+
+---
+
+## 🚀 Instalación y Ejecución
+
+### Opción 1: Docker Compose (Recomendado)
+
+⭐️ **Desarrollado con Clean Code, SOLID y mejores prácticas enterprise**
+
+Esta es la forma **más rápida y sencilla** de levantar todo el proyecto. **Funciona "out of the box"** sin necesidad de configuración adicional.
+
+#### **Paso 1: Clonar el repositorio**
+```bash
+git clone https://github.com/kevinbayter/wom-auth-service-api.git
+cd wom-auth-service-api
+```
+
+#### **Paso 2: Levantar todo el stack**
+```bash
+# Construir y levantar todos los servicios
+docker-compose up -d --build
+
+# Ver logs en tiempo real
+docker-compose logs -f app
+```
+
+> **📌 Nota**: El archivo `.env` ya está incluido en el repositorio con valores preconfigurados para desarrollo. No necesitas crear ni modificar nada.
+
+#### **Paso 3: Verificar que todo esté funcionando**
+```bash
+# Verificar estado de contenedores
+docker-compose ps
+
+# Debe mostrar:
+# wom-auth-service    Up (healthy)
+# wom-auth-postgres   Up (healthy)
+# wom-auth-redis      Up (healthy)
+
+# Verificar health check
+curl http://localhost:8080/actuator/health
+
+# Debe retornar: {"status":"UP"}
+```
+
+#### **Paso 4: Acceder a la aplicación**
+- **API Base URL**: http://localhost:8080
+- **Swagger UI**: http://localhost:8080/swagger-ui/index.html
+- **Health Check**: http://localhost:8080/actuator/health
+- **Métricas Prometheus**: http://localhost:8080/actuator/prometheus
+
+#### **Comandos útiles de Docker Compose**
+```bash
+# Detener servicios
+docker-compose down
+
+# Detener y eliminar volúmenes (CUIDADO: borra datos)
+docker-compose down -v
+
+# Ver logs de un servicio específico
+docker-compose logs -f postgres
+docker-compose logs -f redis
+
+# Reiniciar un servicio
+docker-compose restart app
+
+# Ejecutar comando dentro del contenedor
+docker-compose exec app sh
+```
+
+---
+
+### Opción 2: Ejecución Local
+
+Si prefieres ejecutar la aplicación sin Docker (útil para desarrollo):
+
+#### **Paso 1: Clonar el repositorio**
+```bash
+git clone https://github.com/kevinbayter/wom-auth-service-api.git
+cd wom-auth-service-api
+```
+
+#### **Paso 2: Levantar PostgreSQL y Redis con Docker**
+```bash
+# Levantar solo las bases de datos
+docker-compose up -d postgres redis
+
+# Verificar que estén corriendo
+docker-compose ps
+```
+
+#### **Paso 3: Configurar application-dev.yml**
+El archivo ya está configurado para conectarse a localhost:
+```yaml
+# src/main/resources/application-dev.yml
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/wom_auth_db
+  redis:
+    host: localhost
+    port: 6379
+```
+
+#### **Paso 4: Compilar el proyecto**
+```bash
+# Limpiar y compilar
+./mvnw clean install -DskipTests
+
+# O con tests (toma ~10 segundos)
+./mvnw clean install
+```
+
+#### **Paso 5: Ejecutar la aplicación**
+```bash
+# Opción A: Con Maven (recomendado para desarrollo)
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+
+# Opción B: Con JAR generado
+java -jar -Dspring.profiles.active=dev target/wom-auth-service-api-1.0.0.jar
+```
+
+#### **Paso 6: Verificar que esté funcionando**
+```bash
+# Health check
+curl http://localhost:8080/actuator/health
+
+# Debe retornar: {"status":"UP"}
+```
 
 ---
 
@@ -1667,30 +1821,6 @@ Software Engineer
 - **Comunidad Open Source**: Por las herramientas increíbles
 
 ---
-
-## ⚡ Quick Start (TL;DR)
-
-```bash
-# Clonar repositorio
-git clone https://github.com/kevinbayter/wom-auth-service-api.git
-cd wom-auth-service-api
-
-# Levantar con Docker
-docker-compose up -d --build
-
-# Verificar salud
-curl http://localhost:8080/actuator/health
-
-# Abrir Swagger
-open http://localhost:8080/swagger-ui/index.html
-
-# Login de prueba
-curl -X POST http://localhost:8080/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"identifier": "admin@test.com", "password": "password"}'
-
-# ¡Listo! 🎉
-```
 
 ---
 
