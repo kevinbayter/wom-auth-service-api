@@ -38,6 +38,13 @@ public class TokenService {
         this.jwtService = jwtService;
     }
 
+    /**
+     * Creates and persists refresh token with SHA-256 hash.
+     *
+     * @param userId user ID
+     * @param token JWT refresh token
+     * @return created RefreshToken entity
+     */
     @Transactional
     public RefreshToken createRefreshToken(Long userId, String token) {
         String tokenHash = hashToken(token);
@@ -74,6 +81,11 @@ public class TokenService {
         return Optional.of(newRefreshToken);
     }
 
+    /**
+     * Revokes refresh token to prevent reuse.
+     *
+     * @param token refresh token to revoke
+     */
     @Transactional
     public void revokeRefreshToken(String token) {
         String tokenHash = hashToken(token);
@@ -84,11 +96,22 @@ public class TokenService {
                 });
     }
 
+    /**
+     * Revokes all refresh tokens for a user across all devices.
+     *
+     * @param userId user ID
+     */
     @Transactional
     public void revokeAllUserTokens(Long userId) {
         refreshTokenRepository.revokeAllUserTokens(userId, LocalDateTime.now());
     }
 
+    /**
+     * Blacklists access token in Redis with TTL.
+     *
+     * @param token access token
+     * @param expirationSeconds TTL in seconds
+     */
     public void blacklistAccessToken(String token, Long expirationSeconds) {
         tokenBlacklistRepository.blacklistToken(token, expirationSeconds);
     }

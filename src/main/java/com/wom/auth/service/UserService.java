@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
- * Service for user management operations.
+ * Service for user management and password validation.
  */
 @Slf4j
 @Service
@@ -25,14 +25,12 @@ public class UserService {
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
-
+    /**
+     * Finds user by email or username.
+     *
+     * @param identifier email or username
+     * @return user if found
+     */
     public Optional<User> findByEmailOrUsername(String identifier) {
         return userRepository.findByEmailOrUsername(identifier);
     }
@@ -41,6 +39,13 @@ public class UserService {
         return userRepository.findById(id);
     }
 
+    /**
+     * Validates password using BCrypt constant-time comparison.
+     *
+     * @param rawPassword plain text password
+     * @param encodedPassword BCrypt hash
+     * @return true if password matches
+     */
     public boolean validatePassword(String rawPassword, String encodedPassword) {
         boolean matches = passwordEncoder.matches(rawPassword, encodedPassword);
         log.debug("Password validation - Raw: [{}], Encoded: [{}], Matches: {}", 
@@ -48,6 +53,12 @@ public class UserService {
         return matches;
     }
 
+    /**
+     * Increments failed login attempts.
+     * Locks account for 30 minutes after 5 failed attempts.
+     *
+     * @param user user who failed authentication
+     */
     @Transactional
     public void incrementFailedAttempts(User user) {
         user.incrementFailedAttempts();

@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Service for JWT token generation and validation using RS256 algorithm.
+ * Service for JWT token operations using RS256 asymmetric encryption.
  */
 @Service
 public class JwtService {
@@ -47,6 +47,14 @@ public class JwtService {
         this.publicKey = loadPublicKey();
     }
 
+    /**
+     * Generates short-lived access token with user claims.
+     *
+     * @param userId user identifier
+     * @param username user's username
+     * @param email user's email
+     * @return JWT access token
+     */
     public String generateAccessToken(Long userId, String username, String email) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
@@ -57,6 +65,13 @@ public class JwtService {
         return createToken(claims, username, accessTokenExpiration);
     }
 
+    /**
+     * Generates long-lived refresh token for token rotation.
+     *
+     * @param userId user identifier
+     * @param username user's username
+     * @return JWT refresh token
+     */
     public String generateRefreshToken(Long userId, String username) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
@@ -65,6 +80,13 @@ public class JwtService {
         return createToken(claims, username, refreshTokenExpiration);
     }
 
+    /**
+     * Validates JWT token signature and expiration.
+     *
+     * @param token JWT token to validate
+     * @return claims from valid token
+     * @throws JwtException if token invalid or expired
+     */
     public Claims validateToken(String token) {
         try {
             return Jwts.parserBuilder()
