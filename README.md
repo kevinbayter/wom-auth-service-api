@@ -2,12 +2,15 @@
 
 > **Servicio de Autenticación Empresarial** con JWT, Refresh Tokens, Rate Limiting y Arquitectura Orientada a Servicios (SOA)
 
-[![Java](https://img.shields.io/badge/Java-17-orange?logo=openjdk&logoColor=white)](https://www.oracle.com/java/) [![Spring Boot](https://img.shields.io/badge/Spring_Boot-2.7.18-6DB33F?logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/) [![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis&logoColor=white)](https://redis.io/) [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/) [![Maven](https://img.shields.io/badge/Maven-3.8+-C71A36?logo=apache-maven&logoColor=white)](https://maven.apache.org/) [![Coverage](https://img.shields.io/badge/Coverage-87%25-brightgreen)](https://github.com/kevinbayter/wom-auth-service-api) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Java](https://img.shields.io/badge/Java-17-orange?logo=openjdk&logoColor=white)](https://www.oracle.com/java/) [![Spring Boot](https://img.shields.io/badge/Spring_Boot-2.7.18-6DB33F?logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/) [![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis&logoColor=white)](https://redis.io/)
+
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/) [![Maven](https://img.shields.io/badge/Maven-3.8+-C71A36?logo=apache-maven&logoColor=white)](https://maven.apache.org/) [![Prometheus](https://img.shields.io/badge/Prometheus-Ready-E6522C?logo=prometheus&logoColor=white)](https://prometheus.io/) [![Grafana](https://img.shields.io/badge/Grafana-Compatible-F46800?logo=grafana&logoColor=white)](https://grafana.com/)
+
+[![Coverage](https://img.shields.io/badge/Coverage-87%25-brightgreen)](https://github.com/kevinbayter/wom-auth-service-api) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ---
 
 ## 🚀 Estado del Proyecto
-
 🚧 **Terminado** - Prueba Técnica WOM
 
 ---
@@ -15,30 +18,32 @@
 ## 📋 Índice
 
 1. [Descripción General](#-descripción-general)
-2. [Características Principales](#-características-principales)
-3. [Stack Tecnológico](#️-stack-tecnológico)
-4. [Arquitectura](#️-arquitectura)
+2. [Quick Start](#-quick-start)
+3. [Características Principales](#-características-principales)
+4. [Instalación y Ejecución](#-instalación-y-ejecución)
+   - [Opción 1: Docker Compose (Recomendado)](#opción-1-docker-compose-recomendado)
+   - [Opción 2: Ejecución Local](#opción-2-ejecución-local)
+5. [Stack Tecnológico](#-stack-tecnológico)
+6. [Arquitectura](#-arquitectura)
    - [Diagrama de Arquitectura](#diagrama-de-arquitectura)
    - [Patrones de Diseño](#patrones-de-diseño)
    - [Principios SOLID](#principios-solid)
-5. [Requisitos Previos](#-requisitos-previos)
-6. [Instalación y Ejecución](#-instalación-y-ejecución)
-   - [Opción 1: Docker Compose (Recomendado)](#opción-1-docker-compose-recomendado)
-   - [Opción 2: Ejecución Local](#opción-2-ejecución-local)
-7. [Configuración](#️-configuración)
-8. [API Endpoints](#-api-endpoints)
+7. [Requisitos Previos](#-requisitos-previos)
+8. [Configuración](#-configuración)
+9. [API Endpoints](#-api-endpoints)
    - [Autenticación](#autenticación)
    - [Ejemplos de Uso con cURL](#ejemplos-de-uso-con-curl)
-9. [Documentación Swagger](#-documentación-swagger)
-10. [Testing](#-testing)
-11. [Monitoreo y Métricas](#-monitoreo-y-métricas)
-12. [Seguridad](#-seguridad)
-13. [CI/CD](#-cicd)
-14. [Estructura del Proyecto](#-estructura-del-proyecto)
-15. [Roadmap](#-roadmap)
-16. [Contribución](#-contribución)
-17. [Licencia](#-licencia)
-18. [Contacto](#-contacto)
+10. [Documentación Swagger](#-documentación-swagger)
+11. [Colección de Postman](#-colección-de-postman)
+12. [Testing](#-testing)
+13. [Monitoreo y Métricas](#-monitoreo-y-métricas)
+14. [Seguridad](#-seguridad)
+15. [CI/CD](#-cicd)
+16. [Estructura del Proyecto](#-estructura-del-proyecto)
+17. [Roadmap](#-roadmap)
+18. [Contribución](#-contribución)
+19. [Licencia](#-licencia)
+20. [Contacto](#-contacto)
 
 ---
 
@@ -48,7 +53,7 @@
 
 ### ¿Por qué este proyecto?
 
-Este proyecto fue desarrollado como prueba técnica para demostrar capacidades de desarrollo **Senior Backend**, aplicando:
+Este proyecto fue desarrollado como prueba técnica para **Especialista de Aplicaciones Frontend** en WOM, aplicando mejores prácticas de desarrollo:
 
 - [x] **Principios SOLID** en toda la arquitectura
 - [x] **Clean Code** (métodos <20 líneas, nombres descriptivos, DRY)
@@ -57,6 +62,32 @@ Este proyecto fue desarrollado como prueba técnica para demostrar capacidades d
 - [x] **Observabilidad** (Métricas Prometheus, Health Checks)
 - [x] **DevOps** (Docker, CI/CD, Automatización)
 - [x] **Documentación completa** (Swagger, JavaDoc, README profesional)
+
+---
+
+## ⚡ Quick Start
+
+```bash
+# 1. Clonar repositorio
+git clone https://github.com/kevinbayter/wom-auth-service-api.git
+cd wom-auth-service-api
+
+# 2. Levantar con Docker
+docker-compose up -d --build
+
+# 3. Verificar salud
+curl http://localhost:8080/actuator/health
+
+# 4. Abrir Swagger
+open http://localhost:8080/swagger-ui/index.html
+
+# 5. Login de prueba
+curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"identifier": "admin@test.com", "password": "password"}'
+
+# ¡Listo! 🎉
+```
 
 ---
 
@@ -138,6 +169,133 @@ Este proyecto fue desarrollado como prueba técnica para demostrar capacidades d
 
 ---
 
+## 🚀 Instalación y Ejecución
+
+### Opción 1: Docker Compose (Recomendado)
+
+⭐️ **Desarrollado con Clean Code, SOLID y mejores prácticas enterprise**
+
+Esta es la forma **más rápida y sencilla** de levantar todo el proyecto. **Funciona "out of the box"** sin necesidad de configuración adicional.
+
+#### **Paso 1: Clonar el repositorio**
+```bash
+git clone https://github.com/kevinbayter/wom-auth-service-api.git
+cd wom-auth-service-api
+```
+
+#### **Paso 2: Levantar todo el stack**
+```bash
+# Construir y levantar todos los servicios
+docker-compose up -d --build
+
+# Ver logs en tiempo real
+docker-compose logs -f app
+```
+
+> **📌 Nota**: El archivo `.env` ya está incluido en el repositorio con valores preconfigurados para desarrollo. No necesitas crear ni modificar nada.
+
+#### **Paso 3: Verificar que todo esté funcionando**
+```bash
+# Verificar estado de contenedores
+docker-compose ps
+
+# Debe mostrar:
+# wom-auth-service    Up (healthy)
+# wom-auth-postgres   Up (healthy)
+# wom-auth-redis      Up (healthy)
+
+# Verificar health check
+curl http://localhost:8080/actuator/health
+
+# Debe retornar: {"status":"UP"}
+```
+
+#### **Paso 4: Acceder a la aplicación**
+- **API Base URL**: http://localhost:8080
+- **Swagger UI**: http://localhost:8080/swagger-ui/index.html
+- **Health Check**: http://localhost:8080/actuator/health
+- **Métricas Prometheus**: http://localhost:8080/actuator/prometheus
+
+#### **Comandos útiles de Docker Compose**
+```bash
+# Detener servicios
+docker-compose down
+
+# Detener y eliminar volúmenes (CUIDADO: borra datos)
+docker-compose down -v
+
+# Ver logs de un servicio específico
+docker-compose logs -f postgres
+docker-compose logs -f redis
+
+# Reiniciar un servicio
+docker-compose restart app
+
+# Ejecutar comando dentro del contenedor
+docker-compose exec app sh
+```
+
+---
+
+### Opción 2: Ejecución Local
+
+Si prefieres ejecutar la aplicación sin Docker (útil para desarrollo):
+
+#### **Paso 1: Clonar el repositorio**
+```bash
+git clone https://github.com/kevinbayter/wom-auth-service-api.git
+cd wom-auth-service-api
+```
+
+#### **Paso 2: Levantar PostgreSQL y Redis con Docker**
+```bash
+# Levantar solo las bases de datos
+docker-compose up -d postgres redis
+
+# Verificar que estén corriendo
+docker-compose ps
+```
+
+#### **Paso 3: Configurar application-dev.yml**
+El archivo ya está configurado para conectarse a localhost:
+```yaml
+# src/main/resources/application-dev.yml
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/wom_auth_db
+  redis:
+    host: localhost
+    port: 6379
+```
+
+#### **Paso 4: Compilar el proyecto**
+```bash
+# Limpiar y compilar
+./mvnw clean install -DskipTests
+
+# O con tests (toma ~10 segundos)
+./mvnw clean install
+```
+
+#### **Paso 5: Ejecutar la aplicación**
+```bash
+# Opción A: Con Maven (recomendado para desarrollo)
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+
+# Opción B: Con JAR generado
+java -jar -Dspring.profiles.active=dev target/wom-auth-service-api-1.0.0.jar
+```
+
+#### **Paso 6: Verificar que esté funcionando**
+```bash
+# Health check
+curl http://localhost:8080/actuator/health
+
+# Debe retornar: {"status":"UP"}
+```
+
+---
+
 ## 🏗️ Arquitectura
 
 ### Diagrama de Arquitectura
@@ -150,405 +308,9 @@ Este proyecto fue desarrollado como prueba técnica para demostrar capacidades d
 
 ### Flujo de Refresh Token
 
-![Refresh Token Flow](docs/diagrams/Refresh_Token_Flow.png)```
+![Refresh Token Flow](docs/diagrams/Refresh_Token_Flow.png)
 
-- **Docker Compose**: Levanta todo el stack con un comando┌─────────────────┐
-
-- **CI/CD con GitHub Actions**: Build, tests y análisis automático│  Angular Client │
-
-- **Flyway**: Migraciones de base de datos versionadas└────────┬────────┘
-
-- **Multi-stage Dockerfile**: Imágenes optimizadas para producción         │ HTTP/REST
-
-         ▼
-
----┌─────────────────────────────────────┐
-
-│     Auth Controller (REST API)      │
-
-## 🛠️ Stack Tecnológico├─────────────────────────────────────┤
-
-│  - POST /api/v1/auth/login          │
-
-### Backend Framework│  - POST /api/v1/auth/refresh        │
-
-| Tecnología | Versión | Propósito |│  - POST /api/v1/auth/logout         │
-
-|-----------|---------|-----------|│  - GET  /api/v1/auth/me             │
-
-| ![Java](https://img.shields.io/badge/Java-17-orange?logo=openjdk) | 17 | Lenguaje de programación |└────────┬────────────────────────────┘
-
-| ![Spring Boot](https://img.shields.io/badge/Spring_Boot-2.7.18-6DB33F?logo=spring-boot) | 2.7.18 | Framework principal |         │
-
-| ![Spring Security](https://img.shields.io/badge/Spring_Security-5.7.11-6DB33F?logo=spring) | 5.7.11 | Autenticación y autorización |         ▼
-
-| ![Spring Data JPA](https://img.shields.io/badge/Spring_Data_JPA-2.7.18-6DB33F?logo=spring) | 2.7.18 | Persistencia de datos |┌─────────────────────────────────────┐
-
-| ![Spring Data Redis](https://img.shields.io/badge/Spring_Data_Redis-2.7.18-DC382D?logo=redis) | 2.7.18 | Cache y tokens |│       Service Layer (SOLID)         │
-
-├─────────────────────────────────────┤
-
-### Base de Datos│  - AuthService (orchestration)      │
-
-| Tecnología | Versión | Propósito |│  - UserService (user logic)         │
-
-|-----------|---------|-----------|│  - JwtService  (JWT tokens)         │
-
-| ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-336791?logo=postgresql) | 14-alpine | Base de datos principal (usuarios) |│  - TokenService (refresh tokens)    │
-
-| ![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis) | 7-alpine | Cache, refresh tokens, rate limiting |└────────┬────────────────────────────┘
-
-| ![Flyway](https://img.shields.io/badge/Flyway-9.22-CC0200?logo=flyway) | 9.22.3 | Migraciones de BD |         │
-
-         ▼
-
-### Seguridad┌──────────────┐    ┌──────────────┐
-
-| Tecnología | Versión | Propósito |│  PostgreSQL  │    │    Redis     │
-
-|-----------|---------|-----------|│   (Users)    │    │   (Tokens)   │
-
-| ![JJWT](https://img.shields.io/badge/JJWT-0.11.5-000000) | 0.11.5 | JWT con RS256 |└──────────────┘    └──────────────┘
-
-| BCrypt | (Spring Security) | Hash de contraseñas |```
-
-| ![Bucket4j](https://img.shields.io/badge/Bucket4j-7.6.0-blue) | 7.6.0 | Rate limiting |
-
-## 🚀 Inicio Rápido
-
-### Monitoreo
-
-| Tecnología | Versión | Propósito |### Prerrequisitos
-
-|-----------|---------|-----------|
-
-| ![Actuator](https://img.shields.io/badge/Actuator-2.7.18-6DB33F?logo=spring) | 2.7.18 | Health checks y métricas |- Java 8+
-
-| ![Micrometer](https://img.shields.io/badge/Micrometer-1.9.17-blue) | 1.9.17 | Métricas para Prometheus |- Docker & Docker Compose
-
-| ![Prometheus](https://img.shields.io/badge/Prometheus-Ready-E6522C?logo=prometheus) | Latest | Scraping de métricas |- Maven 3.6+
-
-
-
-### Testing### 1. Clonar el Repositorio
-
-| Tecnología | Versión | Propósito |
-
-|-----------|---------|-----------|```bash
-
-| ![JUnit 5](https://img.shields.io/badge/JUnit-5-25A162?logo=junit5) | 5.8.2 | Framework de testing |git clone https://github.com/tu-usuario/wom-auth-service-api.git
-
-| ![Mockito](https://img.shields.io/badge/Mockito-4.5.1-green) | 4.5.1 | Mocks y stubs |cd wom-auth-service-api
-
-| ![Testcontainers](https://img.shields.io/badge/Testcontainers-1.19.3-blue) | 1.19.3 | Tests con BD reales |```
-
-| ![JaCoCo](https://img.shields.io/badge/JaCoCo-0.8.11-red) | 0.8.11 | Cobertura de código |
-
-### 2. Configurar Variables de Entorno
-
-### Documentación
-
-| Tecnología | Versión | Propósito |El archivo `.env` contiene todas las variables de entorno necesarias.
-
-|-----------|---------|-----------|Ya está preconfigurado para desarrollo local con Docker.
-
-| ![SpringDoc](https://img.shields.io/badge/SpringDoc-1.7.0-85EA2D?logo=swagger) | 1.7.0 | OpenAPI/Swagger UI |
-
-```bash
-
-### DevOps# Revisar y ajustar si es necesario
-
-| Tecnología | Versión | Propósito |cat .env
-
-|-----------|---------|-----------|```
-
-| ![Docker](https://img.shields.io/badge/Docker-Latest-2496ED?logo=docker) | Latest | Containerización |
-
-| ![Docker Compose](https://img.shields.io/badge/Docker_Compose-3.8-2496ED?logo=docker) | 3.8 | Orquestación local |### 3. Levantar Servicios con Docker
-
-| ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI/CD-2088FF?logo=github-actions) | Latest | CI/CD pipeline |
-
-| ![Maven](https://img.shields.io/badge/Maven-3.8+-C71A36?logo=apache-maven) | 3.8+ | Build tool |```bash
-
-# Solo PostgreSQL y Redis (para desarrollo local)
-
----docker-compose up -d postgres redis
-
-
-
-## 🏗️ Arquitectura# O levantar todo (incluida la app)
-
-docker-compose up -d
-
-### Diagrama de Arquitectura```
-
-
-
-El servicio sigue una **arquitectura en capas** (Layered Architecture) con separación clara de responsabilidades:### 4. Ejecutar la Aplicación
-
-
-
-![Arquitectura del Sistema](docs/diagrams/Component_Architecture.png)```bash
-
-# Con Maven
-
-### Patrones de Diseñomvn clean spring-boot:run
-
-
-
-#### 1. **Repository Pattern**# O construir JAR y ejecutar
-
-- Abstracción de la capa de acceso a datosmvn clean package
-
-- `UserRepository`, `RefreshTokenRepository`, `TokenBlacklistRepository`java -jar target/wom-auth-service-api-1.0.0.jar
-
-- Permite cambiar la implementación de persistencia sin afectar la lógica de negocio```
-
-
-
-#### 2. **Service Layer Pattern**### 5. Verificar que está Funcionando
-
-- Encapsula la lógica de negocio
-
-- `AuthService`, `UserService`, `JwtService`, `TokenService`, `MetricsService`- **Aplicación**: http://localhost:8080
-
-- Servicios cohesivos con responsabilidad única (SRP)- **Swagger UI**: http://localhost:8080/swagger-ui.html
-
-- **Health Check**: http://localhost:8080/actuator/health
-
-#### 3. **DTO Pattern (Data Transfer Object)**- **Métricas**: http://localhost:8080/actuator/prometheus
-
-- Objetos de transferencia de datos para requests y responses
-
-- `LoginRequest`, `RefreshTokenRequest`, `LoginResponse`, `UserResponse`## 📡 Endpoints
-
-- Validación centralizada con `@Valid` y Bean Validation
-
-### Autenticación
-
-#### 4. **Strategy Pattern**
-
-- Diferentes estrategias de validación de tokens```http
-
-- Extensible para agregar proveedores de autenticación (OAuth2, 2FA)POST /api/v1/auth/login
-
-Content-Type: application/json
-
-#### 5. **Builder Pattern**
-
-- Construcción de objetos complejos (entidades, DTOs){
-
-- Uso de Lombok `@Builder` para código limpio  "identifier": "user@example.com",
-
-  "password": "yourpassword"
-
-#### 6. **Filter Chain Pattern**}
-
-- Cadena de filtros de seguridad```
-
-- `JwtAuthenticationFilter`, `RateLimitFilter`
-
-- Procesamiento secuencial de requests### Refresh Token
-
-
-
-#### 7. **Dependency Injection Pattern**```http
-
-- Inyección de dependencias con SpringPOST /api/v1/auth/refresh
-
-- Constructor injection (mejores prácticas)Content-Type: application/json
-
-- Desacoplamiento de componentes
-
-{
-
-### Principios SOLID  "refreshToken": "your-refresh-token"
-
-}
-
-#### **S - Single Responsibility Principle**```
-
-Cada clase tiene UNA sola razón para cambiar:
-
-- `AuthService`: Solo autenticación y autorización### Logout
-
-- `JwtService`: Solo generación y validación de JWT
-
-- `TokenService`: Solo gestión de refresh tokens```http
-
-- `UserService`: Solo operaciones de usuarioPOST /api/v1/auth/logout
-
-- `MetricsService`: Solo registro de métricasContent-Type: application/json
-
-
-
-#### **O - Open/Closed Principle**{
-
-Extensible sin modificar código existente:  "refreshToken": "your-refresh-token"
-
-- Preparado para agregar 2FA sin cambiar `AuthService`}
-
-- Nuevos proveedores de autenticación (OAuth2, SAML) por configuración```
-
-- Filtros adicionales sin modificar `SecurityConfig`
-
-### Perfil de Usuario
-
-#### **L - Liskov Substitution Principle**
-
-- Interfaces `JwtService`, `TokenService` intercambiables```http
-
-- Implementaciones pueden ser sustituidas sin romper funcionalidadGET /api/v1/auth/me
-
-Authorization: Bearer your-access-token
-
-#### **I - Interface Segregation Principle**```
-
-- Interfaces específicas, no genéricas gigantes
-
-- Clientes no dependen de métodos que no usanVer documentación completa en **Swagger**: http://localhost:8080/swagger-ui.html
-
-
-
-#### **D - Dependency Inversion Principle**## 📚 Documentación
-
-- Dependencia de abstracciones (interfaces), no implementaciones
-
-- `AuthService` depende de `UserService` (interface), no `UserServiceImpl`- **API Docs (OpenAPI)**: http://localhost:8080/v3/api-docs
-
-- Facilita testing con mocks- **Swagger UI**: http://localhost:8080/swagger-ui.html
-
-- **Plan de Desarrollo**: [PLAN_DESARROLLO.md](PLAN_DESARROLLO.md)
-
-### Flujos Principales- **Reglas de Código**: [REGLAS.md](REGLAS.md)
-
-
-
-#### 🔑 **Login Flow**## 🧪 Tests
-
-```
-
-Cliente → POST /auth/login → AuthController### Ejecutar Tests
-
-         ↓
-
-    AuthService.authenticate()```bash
-
-         ↓# Ejecutar todos los tests
-
-    UserService.findByEmailOrUsername() → PostgreSQLmvn test
-
-         ↓
-
-    UserService.validatePassword() → BCrypt# Ejecutar tests con reporte de cobertura
-
-         ↓mvn clean test jacoco:report
-
-    JwtService.generateAccessToken() → RS256 Sign
-
-         ↓# Ver reporte de cobertura
-
-    JwtService.generateRefreshToken() → RS256 Signopen target/site/jacoco/index.html
-
-         ↓```
-
-    TokenService.createRefreshToken() → Redis (hash SHA-256)
-
-         ↓### Cobertura
-
-    MetricsService.recordLoginSuccess() → Prometheus
-
-         ↓- **Objetivo**: >80%
-
-    LoginResponse{accessToken, refreshToken}- **Herramienta**: JaCoCo
-
-```- El build falla si la cobertura es <80%
-
-
-
-#### 🔄 **Refresh Token Flow**## 📊 Monitoreo
-
-```
-
-Cliente → POST /auth/refresh → AuthController### Actuator Endpoints
-
-         ↓
-
-    AuthService.refreshAccessToken()- **Health**: http://localhost:8080/actuator/health
-
-         ↓- **Metrics**: http://localhost:8080/actuator/metrics
-
-    TokenService.validateRefreshToken() → Redis- **Prometheus**: http://localhost:8080/actuator/prometheus
-
-         ↓
-
-    JwtService.validateToken() → RS256 Verify### Métricas Personalizadas
-
-         ↓
-
-    TokenService.revokeRefreshToken() → Redis (old token)- `auth_login_success_total` - Login exitoso
-
-         ↓- `auth_login_failure_total` - Login fallido
-
-    JwtService.generateAccessToken() → Nuevo access token- `auth_login_latency` - Latencia de login (P95, P99)
-
-         ↓- `auth_refresh_latency` - Latencia de refresh
-
-    JwtService.generateRefreshToken() → Nuevo refresh token
-
-         ↓### Levantar Prometheus + Grafana
-
-    TokenService.createRefreshToken() → Redis (nuevo hash)
-
-         ↓```bash
-
-    MetricsService.recordRefreshSuccess() → Prometheusdocker-compose --profile monitoring up -d
-
-         ↓```
-
-    LoginResponse{accessToken, refreshToken}
-
-```- **Prometheus**: http://localhost:9090
-
-- **Grafana**: http://localhost:3000 (admin/admin)
-
-#### 🚪 **Logout Flow**
-
-```## 🔒 Seguridad
-
-Cliente → POST /auth/logout → AuthController
-
-         ↓- [x] Contraseñas hasheadas con BCrypt
-
-    AuthService.logout(accessToken)- [x] JWT firmados con RS256 (claves asimétricas)
-
-         ↓- [x] Rotación automática de refresh tokens
-
-    TokenService.blacklistAccessToken() → Redis (TTL = token exp)- [x] Detección de reutilización de tokens
-
-         ↓- [x] Rate limiting (5 intentos/minuto por IP)
-
-    JwtService.getUserIdFromToken() → Extract userId- [x] Bloqueo de cuenta tras 5 intentos fallidos
-
-         ↓- [x] CORS configurado
-
-    TokenService.revokeRefreshToken() → Redis- [x] Validación de todas las entradas
-
-         ↓
-
-    MetricsService.recordLogout() → Prometheus## 🎯 Decisiones de Diseño
-
-         ↓
-
-    200 OK {"message": "Logged out successfully"}### ¿Por qué PostgreSQL + Redis?
-
-```
-
-- **PostgreSQL**: Datos críticos y duraderos (usuarios, auditoría)
-
----- **Redis**: Datos volátiles y alta velocidad (tokens, rate limiting)
-
-
+---
 
 ## 📋 Requisitos Previos### ¿Por qué RS256 en lugar de HS256?
 
@@ -1151,6 +913,157 @@ Especificación OpenAPI 3.0 disponible en:
 
 ---
 
+## 📬 Colección de Postman
+
+### Importar Colección
+
+El proyecto incluye una **colección completa de Postman** con todos los endpoints y scripts automáticos para manejo dinámico de tokens.
+
+**📦 Archivos incluidos:**
+- `WOM_Auth_Service_API.postman_collection.json` - Colección de requests
+- `WOM_Auth_Service_API.postman_environment.json` - Variables de entorno
+
+> 📖 **Documentación detallada**: Ver [POSTMAN_COLLECTION.md](POSTMAN_COLLECTION.md) para guía completa con ejemplos, troubleshooting y casos de uso
+
+### Características de la Colección
+
+✅ **Manejo automático de tokens**
+- Login guarda `access_token` y `refresh_token` automáticamente
+- Refresh actualiza tokens dinámicamente
+- No necesitas copiar/pegar tokens manualmente
+
+✅ **Tests automáticos en cada request**
+- Validación de status codes
+- Validación de estructura de respuesta
+- Verificación de Token Rotation
+- Logs detallados en consola de Postman
+
+✅ **15 requests organizados en 3 categorías**
+- **Happy Path** (5): Login exitoso, get user, refresh, logout, logout all devices
+- **Monitoring** (2): Health checks y métricas Prometheus
+- **Error Handling** (3): Tests de seguridad para validar manejo correcto de errores
+
+### Cómo Usar
+
+#### **Paso 1: Importar en Postman**
+
+1. Abrir Postman
+2. Click en **Import** (esquina superior izquierda)
+3. Arrastrar los 2 archivos JSON:
+   - `WOM_Auth_Service_API.postman_collection.json`
+   - `WOM_Auth_Service_API.postman_environment.json`
+4. Click en **Import**
+
+#### **Paso 2: Activar el Environment**
+
+1. En Postman, click en el dropdown de environments (arriba a la derecha)
+2. Seleccionar **"WOM Auth Service - Local"**
+3. Verificar que `base_url` esté en `http://localhost:8080`
+
+#### **Paso 3: Ejecutar Requests**
+
+**Orden recomendado:**
+
+1. **Authentication → 1. Login**
+   - Ejecutar (Cmd/Ctrl + Enter)
+   - ✅ Guarda `access_token` y `refresh_token` automáticamente
+   - Ver logs en consola de Postman
+
+2. **Authentication → 3. Get Current User**
+   - ✅ Usa `access_token` automáticamente
+   - Muestra información del usuario en consola
+
+3. **Authentication → 2. Refresh Token**
+   - ✅ Usa `refresh_token` automáticamente
+   - ✅ Actualiza ambos tokens (Token Rotation)
+   - Ver logs de rotación en consola
+
+4. **Authentication → 4. Logout**
+   - Invalida tokens actuales
+   - Para continuar, ejecutar "1. Login" nuevamente
+
+#### **Paso 4: Ejecutar toda la Colección**
+
+Puedes ejecutar todos los requests automáticamente:
+
+1. Click derecho en la colección **"WOM Auth Service API"**
+2. Seleccionar **"Run collection"**
+3. Click en **"Run WOM Auth Service API"**
+4. Ver resultados de todos los tests
+
+### Scripts Automáticos Incluidos
+
+Cada request incluye scripts Pre-request y Tests:
+
+**Pre-request Scripts:**
+```javascript
+// Valida que existan tokens cuando se requieren
+// Muestra logs informativos
+console.log("🔐 Iniciando login...");
+```
+
+**Test Scripts:**
+```javascript
+// Guarda tokens automáticamente
+pm.environment.set("access_token", jsonData.accessToken);
+pm.environment.set("refresh_token", jsonData.refreshToken);
+
+// Valida respuestas
+pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+});
+
+// Valida Token Rotation
+pm.test("Token Rotation: New refresh token is different", function () {
+    var oldRefreshToken = pm.environment.get("refresh_token");
+    pm.expect(jsonData.refreshToken).to.not.eql(oldRefreshToken);
+});
+```
+
+### Variables de Entorno
+
+El environment incluye:
+
+| Variable | Valor por Defecto | Descripción |
+|----------|-------------------|-------------|
+| `base_url` | `http://localhost:8080` | URL base de la API |
+| `access_token` | (auto) | Se actualiza automáticamente en login/refresh |
+| `refresh_token` | (auto) | Se actualiza automáticamente en login/refresh |
+| `user_email` | `admin@test.com` | Email de prueba |
+| `user_password` | `password` | Contraseña de prueba |
+
+### Carpetas de la Colección
+
+1. **Authentication** (5 requests)
+   - Login
+   - Refresh Token
+   - Get Current User
+   - Logout
+   - Logout All Devices
+
+2. **Health & Monitoring** (2 requests)
+   - Health Check
+   - Prometheus Metrics
+
+3. **Error Cases** (3 requests) - *Tests de manejo de errores*
+   - Login - Invalid Credentials (verifica respuesta 401 con password incorrecto)
+   - Get User - No Token (verifica rechazo sin autenticación)
+   - Refresh - Invalid Token (verifica validación de tokens malformados)
+
+> 💡 **Nota sobre Error Cases**: Estos requests están diseñados para **fallar intencionalmente** y verificar que la API maneja correctamente los errores. Son parte de las pruebas de seguridad.
+
+### Tips
+
+💡 **Ver logs detallados:** Abre la consola de Postman (View → Show Postman Console)
+
+💡 **Ejecutar requests rápido:** Usa `Cmd/Ctrl + Enter`
+
+💡 **Variables de entorno:** Accede con `{{variable_name}}` en cualquier parte del request
+
+💡 **Cambiar servidor:** Edita `base_url` en el environment para apuntar a otro servidor
+
+---
+
 ## 🧪 Testing
 
 ### Ejecutar Tests
@@ -1474,7 +1387,7 @@ Build → Test → Code Quality → Security Scan → Docker Build → Deploy
 
 ### Ver Estado del Build
 
-[![Build Status](https://github.com/kevinbayter/wom-auth-service-api/workflows/CI/badge.svg)](https://github.com/kevinbayter/wom-auth-service-api/actions)
+[![Build Status](docs/images/build_status.png)](https://github.com/kevinbayter/wom-auth-service-api/actions)
 
 ```bash
 # Ver workflows
@@ -1552,7 +1465,7 @@ wom-auth-service-api/
 
 ## 🚦 Roadmap
 
-### Fase 1: [x] Completada
+### Fase: [x] Completada
 - [x] Autenticación JWT con RS256
 - [x] Refresh tokens con rotación
 - [x] Rate limiting
@@ -1653,8 +1566,8 @@ Software Engineer
 
 - 💼 **LinkedIn**: [linkedin.com/in/kevinbayter](https://www.linkedin.com/in/bayterx)
 - 🐙 **GitHub**: [@kevinbayter](https://github.com/kevinbayter)
-- 📧 **Email**: [kevin.bayter@example.com](mailto:kevinbayter@gmail.com)
-- 🌐 **Portfolio**: [kevinbayter.dev](https://bayterx.com)
+- 📧 **Email**: [kevinbayter@gmail.com](mailto:kevinbayter@gmail.com)
+- 🌐 **Portfolio**: [bayterx.com](https://bayterx.com)
 
 ---
 
@@ -1667,30 +1580,6 @@ Software Engineer
 - **Comunidad Open Source**: Por las herramientas increíbles
 
 ---
-
-## ⚡ Quick Start (TL;DR)
-
-```bash
-# Clonar repositorio
-git clone https://github.com/kevinbayter/wom-auth-service-api.git
-cd wom-auth-service-api
-
-# Levantar con Docker
-docker-compose up -d --build
-
-# Verificar salud
-curl http://localhost:8080/actuator/health
-
-# Abrir Swagger
-open http://localhost:8080/swagger-ui/index.html
-
-# Login de prueba
-curl -X POST http://localhost:8080/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"identifier": "admin@test.com", "password": "password"}'
-
-# ¡Listo! 🎉
-```
 
 ---
 
