@@ -2,7 +2,11 @@
 
 > **Servicio de Autenticación Empresarial** con JWT, Refresh Tokens, Rate Limiting y Arquitectura Orientada a Servicios (SOA)
 
-[![Java](https://img.shields.io/badge/Java-17-orange?logo=openjdk&logoColor=white)](https://www.oracle.com/java/) [![Spring Boot](https://img.shields.io/badge/Spring_Boot-2.7.18-6DB33F?logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/) [![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis&logoColor=white)](https://redis.io/) [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/) [![Maven](https://img.shields.io/badge/Maven-3.8+-C71A36?logo=apache-maven&logoColor=white)](https://maven.apache.org/) [![Coverage](https://img.shields.io/badge/Coverage-87%25-brightgreen)](https://github.com/kevinbayter/wom-auth-service-api) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Java](https://img.shields.io/badge/Java-17-orange?logo=openjdk&logoColor=white)](https://www.oracle.com/java/) [![Spring Boot](https://img.shields.io/badge/Spring_Boot-2.7.18-6DB33F?logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/) [![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis&logoColor=white)](https://redis.io/)
+
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/) [![Maven](https://img.shields.io/badge/Maven-3.8+-C71A36?logo=apache-maven&logoColor=white)](https://maven.apache.org/) [![Prometheus](https://img.shields.io/badge/Prometheus-Ready-E6522C?logo=prometheus&logoColor=white)](https://prometheus.io/) [![Grafana](https://img.shields.io/badge/Grafana-Compatible-F46800?logo=grafana&logoColor=white)](https://grafana.com/)
+
+[![Coverage](https://img.shields.io/badge/Coverage-87%25-brightgreen)](https://github.com/kevinbayter/wom-auth-service-api) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ---
 
