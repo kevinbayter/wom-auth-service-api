@@ -133,25 +133,41 @@ public class MetricsService {
     }
 
     /**
-     * Executes a login operation and records its latency.
+     * Executes a login operation and records its success/failure and latency.
      * 
      * @param <T> return type of the operation
      * @param operation the operation to execute
      * @return the result of the operation
+     * @throws RuntimeException if the operation fails
      */
     public <T> T recordLoginOperation(LoginOperation<T> operation) {
-        return loginTimer.record(operation::execute);
+        try {
+            T result = loginTimer.record(operation::execute);
+            recordLoginSuccess();
+            return result;
+        } catch (RuntimeException e) {
+            recordLoginFailure();
+            throw e;
+        }
     }
 
     /**
-     * Executes a refresh operation and records its latency.
+     * Executes a refresh operation and records its success/failure and latency.
      * 
      * @param <T> return type of the operation
      * @param operation the operation to execute
      * @return the result of the operation
+     * @throws RuntimeException if the operation fails
      */
     public <T> T recordRefreshOperation(RefreshOperation<T> operation) {
-        return refreshTimer.record(operation::execute);
+        try {
+            T result = refreshTimer.record(operation::execute);
+            recordRefreshSuccess();
+            return result;
+        } catch (RuntimeException e) {
+            recordRefreshFailure();
+            throw e;
+        }
     }
 
     @FunctionalInterface
