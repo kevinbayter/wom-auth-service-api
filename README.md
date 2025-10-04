@@ -1630,7 +1630,7 @@ Build → Test → Code Quality → Security Scan → Docker Build → Deploy
 
 ### Ver Estado del Build
 
-[![Build Status](https://github.com/kevinbayter/wom-auth-service-api/workflows/CI/badge.svg)](https://github.com/kevinbayter/wom-auth-service-api/actions)
+[![Build Status](docs/images/build_status.png)](https://github.com/kevinbayter/wom-auth-service-api/actions)
 
 ```bash
 # Ver workflows
