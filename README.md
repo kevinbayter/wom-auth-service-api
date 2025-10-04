@@ -1,200 +1,164 @@
-# 🔐 WOM Auth Service API# 🔐 WOM Auth Service API
+# 🔐 WOM Auth Service API
 
+> **Servicio de Autenticación Empresarial** con JWT, Refresh Tokens, Rate Limiting y Arquitectura Orientada a Servicios (SOA)
 
-
-> **Servicio de Autenticación Empresarial** con JWT, Refresh Tokens, Rate Limiting y Arquitectura Orientada a Servicios (SOA)Servicio de autenticación empresarial con JWT, refresh tokens, rate limiting y arquitectura orientada a servicios (SOA).
-
-
-
-[![Java](https://img.shields.io/badge/Java-17-orange?logo=openjdk&logoColor=white)](https://www.oracle.com/java/)## 🚀 Estado del Proyecto
-
+[![Java](https://img.shields.io/badge/Java-17-orange?logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-2.7.18-6DB33F?logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
-
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)🚧 **En Desarrollo** - Prueba Técnica WOM
-
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis&logoColor=white)](https://redis.io/)
-
-[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)## 📋 Índice
-
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 [![Maven](https://img.shields.io/badge/Maven-3.8+-C71A36?logo=apache-maven&logoColor=white)](https://maven.apache.org/)
+[![Build Status](https://github.com/kevinbayter/wom-auth-service-api/workflows/CI/badge.svg)](https://github.com/kevinbayter/wom-auth-service-api/actions)
+[![Coverage](https://img.shields.io/badge/Coverage-87%25-brightgreen)](https://github.com/kevinbayter/wom-auth-service-api)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-- [Características](#características)
+---
 
-[![Build Status](https://github.com/kevinbayter/wom-auth-service-api/workflows/CI/badge.svg)](https://github.com/kevinbayter/wom-auth-service-api/actions)- [Stack Tecnológico](#stack-tecnológico)
+## 🚀 Estado del Proyecto
 
-[![Coverage](https://img.shields.io/badge/Coverage-87%25-brightgreen)](https://github.com/kevinbayter/wom-auth-service-api)- [Arquitectura](#arquitectura)
+🚧 **En Desarrollo** - Prueba Técnica WOM
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)- [Inicio Rápido](#inicio-rápido)
+---
 
-- [Endpoints](#endpoints)
+## 📋 Índice
 
----- [Documentación](#documentación)
-
-- [Tests](#tests)
-
-## 📋 Índice- [Monitoreo](#monitoreo)
-
-
-
-1. [Descripción General](#-descripción-general)## ✨ Características
-
+1. [Descripción General](#-descripción-general)
 2. [Características Principales](#-características-principales)
-
-3. [Stack Tecnológico](#️-stack-tecnológico)- ✅ Autenticación con JWT (RS256)
-
-4. [Arquitectura](#️-arquitectura)- ✅ Refresh tokens con rotación automática
-
-   - [Diagrama de Arquitectura](#diagrama-de-arquitectura)- ✅ Rate limiting para prevenir brute force
-
-   - [Patrones de Diseño](#patrones-de-diseño)- ✅ Manejo de intentos fallidos y bloqueo de cuenta
-
-   - [Principios SOLID](#principios-solid)- ✅ Bcrypt para hashing de contraseñas
-
-5. [Requisitos Previos](#-requisitos-previos)- ✅ Preparado para 2FA (arquitectura extensible)
-
-6. [Instalación y Ejecución](#-instalación-y-ejecución)- ✅ Métricas Prometheus
-
-   - [Opción 1: Docker Compose (Recomendado)](#opción-1-docker-compose-recomendado)- ✅ Health checks
-
-   - [Opción 2: Ejecución Local](#opción-2-ejecución-local)- ✅ Documentación Swagger/OpenAPI
-
-7. [Configuración](#️-configuración)- ✅ Dockerizado
-
+3. [Stack Tecnológico](#️-stack-tecnológico)
+4. [Arquitectura](#️-arquitectura)
+   - [Diagrama de Arquitectura](#diagrama-de-arquitectura)
+   - [Patrones de Diseño](#patrones-de-diseño)
+   - [Principios SOLID](#principios-solid)
+5. [Requisitos Previos](#-requisitos-previos)
+6. [Instalación y Ejecución](#-instalación-y-ejecución)
+   - [Opción 1: Docker Compose (Recomendado)](#opción-1-docker-compose-recomendado)
+   - [Opción 2: Ejecución Local](#opción-2-ejecución-local)
+7. [Configuración](#️-configuración)
 8. [API Endpoints](#-api-endpoints)
-
-   - [Autenticación](#autenticación)## 🛠️ Stack Tecnológico
-
+   - [Autenticación](#autenticación)
    - [Ejemplos de Uso con cURL](#ejemplos-de-uso-con-curl)
-
-9. [Documentación Swagger](#-documentación-swagger)### Backend
-
-10. [Testing](#-testing)- **Java 8**
-
-11. [Monitoreo y Métricas](#-monitoreo-y-métricas)- **Spring Boot 2.7.18** (última compatible con Java 8)
-
-12. [Seguridad](#-seguridad)- **Spring Security** (autenticación y autorización)
-
-13. [CI/CD](#-cicd)- **Spring Data JPA** (persistencia)
-
-14. [Estructura del Proyecto](#-estructura-del-proyecto)- **Spring Data Redis** (gestión de tokens)
-
+9. [Documentación Swagger](#-documentación-swagger)
+10. [Testing](#-testing)
+11. [Monitoreo y Métricas](#-monitoreo-y-métricas)
+12. [Seguridad](#-seguridad)
+13. [CI/CD](#-cicd)
+14. [Estructura del Proyecto](#-estructura-del-proyecto)
 15. [Roadmap](#-roadmap)
+16. [Contribución](#-contribución)
+17. [Licencia](#-licencia)
+18. [Contacto](#-contacto)
 
-16. [Contribución](#-contribución)### Base de Datos
+---
 
-17. [Licencia](#-licencia)- **PostgreSQL 14** (datos persistentes)
-
-18. [Contacto](#-contacto)- **Redis 7** (tokens, rate limiting, blacklist)
-
-
-
----### Seguridad
-
-- **JWT (JJWT)** con RS256
-
-## 🎯 Descripción General- **BCrypt** (Spring Security)
-
-- **Bucket4j** (rate limiting)
+## 🎯 Descripción General
 
 **WOM Auth Service API** es un servicio de autenticación de nivel empresarial diseñado siguiendo las mejores prácticas de la industria. Implementa un sistema completo de autenticación JWT con refresh tokens, rotación automática de tokens, rate limiting, gestión de intentos fallidos y arquitectura preparada para escalabilidad horizontal.
 
-### Monitoreo
-
-### ¿Por qué este proyecto?- **Spring Boot Actuator**
-
-- **Micrometer** (métricas Prometheus)
+### ¿Por qué este proyecto?
 
 Este proyecto fue desarrollado como prueba técnica para demostrar capacidades de desarrollo **Senior Backend**, aplicando:
 
+- [x] **Principios SOLID** en toda la arquitectura
+- [x] **Clean Code** (métodos <20 líneas, nombres descriptivos, DRY)
+- [x] **Test-Driven Development** (TDD) con cobertura >80%
+- [x] **Seguridad robusta** (BCrypt, JWT RS256, Rate Limiting)
+- [x] **Observabilidad** (Métricas Prometheus, Health Checks)
+- [x] **DevOps** (Docker, CI/CD, Automatización)
+- [x] **Documentación completa** (Swagger, JavaDoc, README profesional)
+
+---
+
+## ✨ Características Principales
+
+### 🔒 Seguridad
+
+- **JWT con RS256**: Tokens firmados con claves asimétricas (pública/privada)
+- **BCrypt**: Hash de contraseñas con salt automático
+- **Refresh Token Rotation**: Rotación automática para prevenir reutilización
+- **Token Blacklisting**: Invalidación de tokens en Redis
+- **Rate Limiting**: Protección contra ataques de fuerza bruta
+- **Account Locking**: Bloqueo temporal tras 5 intentos fallidos (30 minutos)
+
+### 🚀 Funcionalidades
+
+- **Login**: Autenticación con email/username + contraseña
+- **Token Refresh**: Renovación de access tokens con refresh tokens
+- **Logout**: Cierre de sesión con invalidación de tokens
+- **Logout All Devices**: Cierre de sesión en todos los dispositivos
+- **User Profile**: Obtención del perfil del usuario autenticado
+
+### 📊 Monitoreo y Observabilidad
+
+- **Métricas Prometheus**: Contadores y latencias de operaciones
+- **Health Checks**: Estado de PostgreSQL y Redis
+- **Custom Metrics**: 
+  - `auth.login.success` / `auth.login.failure`
+  - `auth.refresh.success` / `auth.refresh.failure`
+  - `auth.login.latency` (P50, P95, P99)
+  - `auth.refresh.latency` (P50, P95, P99)
+  - `auth.logout` (contador)
+
+### 🧪 Testing
+
+- **252 tests** (unitarios + integración)
+- **87% de cobertura** de código
+- **Testcontainers**: Tests con PostgreSQL y Redis reales
+- **Tests de seguridad**: Validación de tokens, rate limiting, intentos fallidos
+
+### 🛠️ DevOps
+
+- **Docker Compose**: Levanta todo el stack con un comando
+- **CI/CD con GitHub Actions**: Build, tests y análisis automático
+
+---
+
+## 🛠️ Stack Tecnológico
+
+### Backend
+- **Java 17**
+- **Spring Boot 2.7.18**
+- **Spring Security** (autenticación y autorización)
+- **Spring Data JPA** (persistencia)
+- **Spring Data Redis** (gestión de tokens)
+
+### Base de Datos
+- **PostgreSQL 14** (datos persistentes)
+- **Redis 7** (tokens, rate limiting, blacklist)
+
+### Seguridad
+- **JWT (JJWT 0.11.5)** con RS256
+- **BCrypt** (Spring Security)
+- **Bucket4j 7.6.0** (rate limiting)
+
+### Monitoreo
+- **Spring Boot Actuator 2.7.18**
+- **Micrometer 1.9.17** (métricas Prometheus)
+
 ### Testing
+- **JUnit 5.8.2**
+- **Mockito 4.5.1**
+- **Testcontainers 1.19.3** (PostgreSQL + Redis reales)
+- **JaCoCo 0.8.11** (cobertura >80%)
 
-- ✅ **Principios SOLID** en toda la arquitectura- **JUnit 5**
-
-- ✅ **Clean Code** (métodos <20 líneas, nombres descriptivos, DRY)- **Mockito**
-
-- ✅ **Test-Driven Development** (TDD) con cobertura >80%- **Testcontainers** (PostgreSQL + Redis reales)
-
-- ✅ **Seguridad robusta** (BCrypt, JWT RS256, Rate Limiting)- **JaCoCo** (cobertura >80%)
-
-- ✅ **Observabilidad** (Métricas Prometheus, Health Checks)
-
-- ✅ **DevOps** (Docker, CI/CD, Automatización)### DevOps
-
-- ✅ **Documentación completa** (Swagger, JavaDoc, README profesional)- **Docker & Docker Compose**
-
+### DevOps
+- **Docker & Docker Compose 3.8**
 - **GitHub Actions** (CI/CD)
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Arquitectura
 
-## ✨ Características Principales
+### Diagrama de Arquitectura
 
-### System Context Diagram (C4 Level 1)
+![Arquitectura del Sistema](docs/diagrams/Component_Architecture.png)
 
-### 🔒 Seguridad
+### Flujo de Autenticación
 
-- **JWT con RS256**: Tokens firmados con claves asimétricas (pública/privada)High-level view of the authentication service and its external dependencies:
+![Authentication Flow](docs/diagrams/Authentication_Flow.png)
 
-- **BCrypt**: Hash de contraseñas con salt automático
+### Flujo de Refresh Token
 
-- **Refresh Token Rotation**: Rotación automática para prevenir reutilización![System Context Diagram](docs/diagrams/C4_Context.png)
-
-- **Token Blacklisting**: Invalidación de tokens en Redis
-
-- **Rate Limiting**: Protección contra ataques de fuerza bruta### Container Diagram (C4 Level 2)
-
-- **Account Locking**: Bloqueo temporal tras 5 intentos fallidos (30 minutos)
-
-Internal structure showing services, controllers, and data stores:
-
-### 🚀 Funcionalidades
-
-- **Login**: Autenticación con email/username + contraseña![Container Diagram](docs/diagrams/C4_Container.png)
-
-- **Token Refresh**: Renovación de access tokens con refresh tokens
-
-- **Logout**: Cierre de sesión con invalidación de tokens### Component Architecture
-
-- **Logout All Devices**: Cierre de sesión en todos los dispositivos
-
-- **User Profile**: Obtención del perfil del usuario autenticadoDetailed component architecture following SOLID principles:
-
-
-
-### 📊 Monitoreo y Observabilidad![Component Architecture](docs/diagrams/Component_Architecture.png)
-
-- **Métricas Prometheus**: Contadores y latencias de operaciones
-
-- **Health Checks**: Estado de PostgreSQL y Redis### Authentication Flow
-
-- **Custom Metrics**: 
-
-  - `auth.login.success` / `auth.login.failure`Sequence diagram showing the complete login process:
-
-  - `auth.refresh.success` / `auth.refresh.failure`
-
-  - `auth.login.latency` (P50, P95, P99)![Authentication Flow](docs/diagrams/Authentication_Flow.png)
-
-  - `auth.refresh.latency` (P50, P95, P99)
-
-  - `auth.logout` (contador)### Refresh Token Flow
-
-
-
-### 🧪 TestingSequence diagram showing token rotation mechanism:
-
-- **252 tests** (unitarios + integración)
-
-- **87% de cobertura** de código![Refresh Token Flow](docs/diagrams/Refresh_Token_Flow.png)
-
-- **Testcontainers**: Tests con PostgreSQL y Redis reales
-
-- **Tests de seguridad**: Validación de tokens, rate limiting, intentos fallidos### Architecture Principles
-
-
-
-### 🛠️ DevOps```
+![Refresh Token Flow](docs/diagrams/Refresh_Token_Flow.png)```
 
 - **Docker Compose**: Levanta todo el stack con un comando┌─────────────────┐
 
@@ -562,21 +526,21 @@ Cliente → POST /auth/refresh → AuthController### Actuator Endpoints
 
 Cliente → POST /auth/logout → AuthController
 
-         ↓- ✅ Contraseñas hasheadas con BCrypt
+         ↓- [x] Contraseñas hasheadas con BCrypt
 
-    AuthService.logout(accessToken)- ✅ JWT firmados con RS256 (claves asimétricas)
+    AuthService.logout(accessToken)- [x] JWT firmados con RS256 (claves asimétricas)
 
-         ↓- ✅ Rotación automática de refresh tokens
+         ↓- [x] Rotación automática de refresh tokens
 
-    TokenService.blacklistAccessToken() → Redis (TTL = token exp)- ✅ Detección de reutilización de tokens
+    TokenService.blacklistAccessToken() → Redis (TTL = token exp)- [x] Detección de reutilización de tokens
 
-         ↓- ✅ Rate limiting (5 intentos/minuto por IP)
+         ↓- [x] Rate limiting (5 intentos/minuto por IP)
 
-    JwtService.getUserIdFromToken() → Extract userId- ✅ Bloqueo de cuenta tras 5 intentos fallidos
+    JwtService.getUserIdFromToken() → Extract userId- [x] Bloqueo de cuenta tras 5 intentos fallidos
 
-         ↓- ✅ CORS configurado
+         ↓- [x] CORS configurado
 
-    TokenService.revokeRefreshToken() → Redis- ✅ Validación de todas las entradas
+    TokenService.revokeRefreshToken() → Redis- [x] Validación de todas las entradas
 
          ↓
 
@@ -1132,11 +1096,11 @@ Una vez la aplicación esté corriendo, accede a:
 
 ### Características de Swagger
 
-- ✅ **Documentación interactiva** de todos los endpoints
-- ✅ **Esquemas de request/response** con ejemplos
-- ✅ **Autenticación JWT integrada** (botón "Authorize")
-- ✅ **Try it out**: Ejecutar requests directamente desde el navegador
-- ✅ **Códigos de error documentados**
+- [x] **Documentación interactiva** de todos los endpoints
+- [x] **Esquemas de request/response** con ejemplos
+- [x] **Autenticación JWT integrada** (botón "Authorize")
+- [x] **Try it out**: Ejecutar requests directamente desde el navegador
+- [x] **Códigos de error documentados**
 
 ### Cómo usar Swagger
 
@@ -1423,12 +1387,12 @@ docker-compose --profile monitoring up -d
 
 ### Mejores Prácticas Implementadas
 
-✅ **No se loguean contraseñas ni tokens completos**  
-✅ **Información sensible no se expone en errores**  
-✅ **Validación en múltiples capas (controller, service, entity)**  
-✅ **Principio de mínimo privilegio**  
-✅ **Configuración externalizada (no hardcoded)**  
-✅ **Auditoría de intentos de login**
+[x] **No se loguean contraseñas ni tokens completos**  
+[x] **Información sensible no se expone en errores**  
+[x] **Validación en múltiples capas (controller, service, entity)**  
+[x] **Principio de mínimo privilegio**  
+[x] **Configuración externalizada (no hardcoded)**  
+[x] **Auditoría de intentos de login**
 
 ### Consideraciones de Seguridad
 
@@ -1571,7 +1535,7 @@ wom-auth-service-api/
 
 ## 🚦 Roadmap
 
-### Fase 1: ✅ Completada
+### Fase 1: [x] Completada
 - [x] Autenticación JWT con RS256
 - [x] Refresh tokens con rotación
 - [x] Rate limiting
@@ -1662,11 +1626,11 @@ test(auth): add integration tests for logout
 
 ### Estándares de Código
 
-- ✅ Seguir principios SOLID
-- ✅ Clean Code (métodos <20 líneas)
-- ✅ JavaDoc en métodos públicos
-- ✅ Tests para nueva funcionalidad (>80% coverage)
-- ✅ Ejecutar `mvn verify` antes de commit
+- [x] Seguir principios SOLID
+- [x] Clean Code (métodos <20 líneas)
+- [x] JavaDoc en métodos públicos
+- [x] Tests para nueva funcionalidad (>80% coverage)
+- [x] Ejecutar `mvn verify` antes de commit
 
 ---
 
