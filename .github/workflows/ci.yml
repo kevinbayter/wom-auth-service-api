@@ -87,8 +87,8 @@ jobs:
           SPRING_REDIS_PORT: 6379
         run: ./mvnw test -B
 
-      - name: Generate JaCoCo coverage report
-        run: ./mvnw jacoco:report
+      - name: Verify coverage (minimum 80%)
+        run: ./mvnw verify -DskipTests -B
 
       - name: SonarQube Scan
         continue-on-error: true
@@ -104,10 +104,6 @@ jobs:
           else
             echo "SonarQube token not configured, skipping scan"
           fi
-
-      - name: Check code coverage
-        continue-on-error: true
-        run: ./mvnw jacoco:check
 
       - name: OWASP Dependency Check
         if: env.NVD_API_KEY != ''

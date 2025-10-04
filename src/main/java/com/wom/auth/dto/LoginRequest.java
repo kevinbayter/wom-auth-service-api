@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Data
 @NoArgsConstructor
@@ -23,9 +24,11 @@ public class LoginRequest {
 
     @Schema(
             description = "User password",
-            example = "password",
-            required = true
+            example = "password123",
+            required = true,
+            minLength = 8
     )
     @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
 }

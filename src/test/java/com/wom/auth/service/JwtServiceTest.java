@@ -6,6 +6,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.security.KeyPair;
@@ -15,9 +18,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for JwtService.
- * 
- * @author Kevin Bayter
- * @see <a href="https://github.com/kevinbayter">GitHub Profile</a>
  */
 class JwtServiceTest {
 
@@ -142,5 +142,179 @@ class JwtServiceTest {
         // Then
         assertNotNull(username);
         assertEquals(expectedUsername, username);
+    }
+
+    @Test
+    void getTokenType_WithAccessToken_ShouldReturnAccess() {
+        // Given
+        String token = jwtService.generateAccessToken(1L, "testuser", "test@example.com");
+
+        // When
+        String tokenType = jwtService.getTokenType(token);
+
+        // Then
+        assertNotNull(tokenType);
+        assertEquals("access", tokenType);
+    }
+
+    @Test
+    void getTokenType_WithRefreshToken_ShouldReturnRefresh() {
+        // Given
+        String token = jwtService.generateRefreshToken(1L, "testuser");
+
+        // When
+        String tokenType = jwtService.getTokenType(token);
+
+        // Then
+        assertNotNull(tokenType);
+        assertEquals("refresh", tokenType);
+    }
+
+    @Test
+    void isTokenExpired_WithValidToken_ShouldReturnFalse() {
+        // Given
+        String token = jwtService.generateAccessToken(1L, "testuser", "test@example.com");
+
+        // When
+        boolean isExpired = jwtService.isTokenExpired(token);
+
+        // Then
+        assertFalse(isExpired);
+    }
+
+    @Test
+    void isTokenExpired_WithExpiredToken_ShouldReturnTrue() {
+        // Given
+        Date pastDate = new Date(System.currentTimeMillis() - 1000000);
+        String expiredToken = Jwts.builder()
+                .setSubject("testuser")
+                .setIssuedAt(pastDate)
+                .setExpiration(pastDate)
+                .signWith(keyPair.getPrivate(), SignatureAlgorithm.RS256)
+                .compact();
+
+        // When
+        boolean isExpired = jwtService.isTokenExpired(expiredToken);
+
+        // Then
+        assertTrue(isExpired);
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"invalid.token.format"})
+    void isTokenExpired_WithInvalidTokens_ShouldReturnTrue(String invalidToken) {
+        // When
+        boolean isExpired = jwtService.isTokenExpired(invalidToken);
+
+        // Then
+        assertTrue(isExpired);
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"invalid.token.format", "not.a.valid.jwt.token", "header.payload"})
+    void validateToken_WithInvalidTokens_ShouldThrowException(String invalidToken) {
+        // When & Then
+        assertThrows(Exception.class, () -> jwtService.validateToken(invalidToken));
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"invalid.token.format"})
+    void getUserIdFromToken_WithInvalidTokens_ShouldThrowException(String invalidToken) {
+        // When & Then
+        assertThrows(Exception.class, () -> jwtService.getUserIdFromToken(invalidToken));
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"invalid.token.format"})
+    void getUsernameFromToken_WithInvalidTokens_ShouldThrowException(String invalidToken) {
+        // When & Then
+        assertThrows(Exception.class, () -> jwtService.getUsernameFromToken(invalidToken));
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"invalid.token.format"})
+    void getTokenType_WithInvalidTokens_ShouldThrowException(String invalidToken) {
+        // When & Then
+        assertThrows(Exception.class, () -> jwtService.getTokenType(invalidToken));
+    }
+
+    @Test
+    void validateToken_WithRefreshToken_ShouldReturnClaims() {
+        // Given
+        Long userId = 789L;
+        String username = "refreshuser";
+        String token = jwtService.generateRefreshToken(userId, username);
+
+        // When
+        Claims claims = jwtService.validateToken(token);
+
+        // Then
+        assertNotNull(claims);
+        assertEquals(userId, claims.get("userId", Long.class));
+        assertEquals(username, claims.getSubject());
+        assertEquals("refresh", claims.get("type", String.class));
+    }
+
+    @Test
+    void generateAccessToken_ShouldContainExpirationTime() {
+        // Given
+        String token = jwtService.generateAccessToken(1L, "testuser", "test@example.com");
+
+        // When
+        Claims claims = jwtService.validateToken(token);
+
+        // Then
+        assertNotNull(claims.getExpiration());
+        assertTrue(claims.getExpiration().after(new Date()));
+    }
+
+    @Test
+    void generateRefreshToken_ShouldContainExpirationTime() {
+        // Given
+        String token = jwtService.generateRefreshToken(1L, "testuser");
+
+        // When
+        Claims claims = jwtService.validateToken(token);
+
+        // Then
+        assertNotNull(claims.getExpiration());
+        assertTrue(claims.getExpiration().after(new Date()));
+    }
+
+    @Test
+    void refreshToken_ShouldHaveLongerExpirationThanAccessToken() throws InterruptedException {
+        // Given
+        String accessToken = jwtService.generateAccessToken(1L, "testuser", "test@example.com");
+        Thread.sleep(10); // Small delay to ensure different issued times
+        String refreshToken = jwtService.generateRefreshToken(1L, "testuser");
+
+        // When
+        Claims accessClaims = jwtService.validateToken(accessToken);
+        Claims refreshClaims = jwtService.validateToken(refreshToken);
+
+        // Then
+        assertTrue(refreshClaims.getExpiration().after(accessClaims.getExpiration()));
+    }
+
+    @Test
+    void validateToken_WithTokenSignedByDifferentKey_ShouldThrowException() {
+        // Given
+        KeyPair differentKeyPair = Keys.keyPairFor(SignatureAlgorithm.RS256);
+        String token = Jwts.builder()
+                .setSubject("testuser")
+                .claim("userId", 1L)
+                .claim("type", "access")
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 60000))
+                .signWith(differentKeyPair.getPrivate(), SignatureAlgorithm.RS256)
+                .compact();
+
+        // When & Then
+        assertThrows(Exception.class, () -> jwtService.validateToken(token));
     }
 }
