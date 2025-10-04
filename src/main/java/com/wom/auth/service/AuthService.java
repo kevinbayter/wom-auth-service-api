@@ -84,7 +84,6 @@ public class AuthService {
         }
 
         Long userId = jwtService.getUserIdFromToken(refreshToken);
-        String username = jwtService.getUsernameFromToken(refreshToken);
         
         Optional<User> userOpt = userService.findById(userId);
         if (userOpt.isEmpty()) {
