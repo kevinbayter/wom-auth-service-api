@@ -5,6 +5,7 @@ import com.wom.auth.entity.RefreshToken;
 import com.wom.auth.entity.User;
 import com.wom.auth.exception.AccountLockedException;
 import com.wom.auth.exception.InvalidCredentialsException;
+import com.wom.auth.metrics.MetricsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.impl.DefaultClaims;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +38,9 @@ class AuthServiceTest {
     @Mock
     private TokenService tokenService;
 
+    @Mock
+    private MetricsService metricsService;
+
     @InjectMocks
     private AuthService authService;
 
@@ -68,6 +72,17 @@ class AuthServiceTest {
                 .tokenHash("hashedToken")
                 .expiresAt(LocalDateTime.now().plusDays(7))
                 .build();
+        
+        // Setup MetricsService mocks to execute the operation (lenient for flexibility)
+        lenient().when(metricsService.recordLoginOperation(any())).thenAnswer(invocation -> {
+            MetricsService.LoginOperation<?> operation = invocation.getArgument(0);
+            return operation.execute();
+        });
+        
+        lenient().when(metricsService.recordRefreshOperation(any())).thenAnswer(invocation -> {
+            MetricsService.RefreshOperation<?> operation = invocation.getArgument(0);
+            return operation.execute();
+        });
     }
 
     @Test
