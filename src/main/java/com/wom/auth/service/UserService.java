@@ -25,6 +25,14 @@ public class UserService {
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
     /**
      * Finds user by email or username.
      *
