@@ -35,96 +35,82 @@ public class AuthService {
 
     @Transactional
     public LoginResponse authenticate(String identifier, String password) {
-        long startTime = System.currentTimeMillis();
-        
-        try {
-            return metricsService.recordLoginOperation(() -> {
-                Optional<User> userOpt = userService.findByEmailOrUsername(identifier);
-                
-                if (userOpt.isEmpty()) {
-                    throw new InvalidCredentialsException("Invalid credentials");
-                }
+        return metricsService.recordLoginOperation(() -> {
+            Optional<User> userOpt = userService.findByEmailOrUsername(identifier);
+            
+            if (userOpt.isEmpty()) {
+                throw new InvalidCredentialsException("Invalid credentials");
+            }
 
-                User user = userOpt.get();
+            User user = userOpt.get();
 
-                if (userService.isAccountLocked(user)) {
-                    throw new AccountLockedException("Account is locked", user.getLockedUntil());
-                }
+            if (userService.isAccountLocked(user)) {
+                throw new AccountLockedException("Account is locked", user.getLockedUntil());
+            }
 
-                if (!userService.isAccountActive(user)) {
-                    throw new InvalidCredentialsException("Account is not active");
-                }
+            if (!userService.isAccountActive(user)) {
+                throw new InvalidCredentialsException("Account is not active");
+            }
 
-                if (!userService.validatePassword(password, user.getPasswordHash())) {
-                    userService.incrementFailedAttempts(user);
-                    throw new InvalidCredentialsException("Invalid credentials");
-                }
+            if (!userService.validatePassword(password, user.getPasswordHash())) {
+                userService.incrementFailedAttempts(user);
+                throw new InvalidCredentialsException("Invalid credentials");
+            }
 
-                userService.resetFailedAttempts(user);
-                userService.updateLastLogin(user);
+            userService.resetFailedAttempts(user);
+            userService.updateLastLogin(user);
 
-                String accessToken = jwtService.generateAccessToken(user.getId(), user.getUsername(), user.getEmail());
-                String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getUsername());
-                
-                tokenService.createRefreshToken(user.getId(), refreshToken);
+            String accessToken = jwtService.generateAccessToken(user.getId(), user.getUsername(), user.getEmail());
+            String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getUsername());
+            
+            tokenService.createRefreshToken(user.getId(), refreshToken);
 
-                return LoginResponse.builder()
-                        .accessToken(accessToken)
-                        .refreshToken(refreshToken)
-                        .tokenType("Bearer")
-                        .expiresIn(accessTokenExpiration / 1000)
-                        .build();
-            });
-        } finally {
-            long latency = System.currentTimeMillis() - startTime;
-            metricsService.recordLoginLatency(latency);
-        }
+            return LoginResponse.builder()
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .tokenType("Bearer")
+                    .expiresIn(accessTokenExpiration / 1000)
+                    .build();
+        });
     }
 
     @Transactional
     public LoginResponse refreshAccessToken(String refreshToken) {
-        long startTime = System.currentTimeMillis();
-        
-        try {
-            return metricsService.recordRefreshOperation(() -> {
-                Optional<RefreshToken> validToken = tokenService.validateRefreshToken(refreshToken);
-                
-                if (validToken.isEmpty()) {
-                    throw new IllegalArgumentException("Invalid or expired refresh token");
-                }
+        return metricsService.recordRefreshOperation(() -> {
+            Optional<RefreshToken> validToken = tokenService.validateRefreshToken(refreshToken);
+            
+            if (validToken.isEmpty()) {
+                throw new IllegalArgumentException("Invalid or expired refresh token");
+            }
 
-                try {
-                    jwtService.validateToken(refreshToken);
-                } catch (Exception e) {
-                    throw new IllegalArgumentException("Invalid refresh token", e);
-                }
+            try {
+                jwtService.validateToken(refreshToken);
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Invalid refresh token", e);
+            }
 
-                Long userId = jwtService.getUserIdFromToken(refreshToken);
-                
-                Optional<User> userOpt = userService.findById(userId);
-                if (userOpt.isEmpty()) {
-                    throw new IllegalArgumentException("User not found");
-                }
+            Long userId = jwtService.getUserIdFromToken(refreshToken);
+            
+            Optional<User> userOpt = userService.findById(userId);
+            if (userOpt.isEmpty()) {
+                throw new IllegalArgumentException("User not found");
+            }
 
-                User user = userOpt.get();
+            User user = userOpt.get();
 
-                String newAccessToken = jwtService.generateAccessToken(user.getId(), user.getUsername(), user.getEmail());
-                String newRefreshTokenJwt = jwtService.generateRefreshToken(user.getId(), user.getUsername());
-                
-                tokenService.revokeRefreshToken(refreshToken);
-                tokenService.createRefreshToken(user.getId(), newRefreshTokenJwt);
+            String newAccessToken = jwtService.generateAccessToken(user.getId(), user.getUsername(), user.getEmail());
+            String newRefreshTokenJwt = jwtService.generateRefreshToken(user.getId(), user.getUsername());
+            
+            tokenService.revokeRefreshToken(refreshToken);
+            tokenService.createRefreshToken(user.getId(), newRefreshTokenJwt);
 
-                return LoginResponse.builder()
-                        .accessToken(newAccessToken)
-                        .refreshToken(newRefreshTokenJwt)
-                        .tokenType("Bearer")
-                        .expiresIn(accessTokenExpiration / 1000)
-                        .build();
-            });
-        } finally {
-            long latency = System.currentTimeMillis() - startTime;
-            metricsService.recordRefreshLatency(latency);
-        }
+            return LoginResponse.builder()
+                    .accessToken(newAccessToken)
+                    .refreshToken(newRefreshTokenJwt)
+                    .tokenType("Bearer")
+                    .expiresIn(accessTokenExpiration / 1000)
+                    .build();
+        });
     }
 
     @Transactional

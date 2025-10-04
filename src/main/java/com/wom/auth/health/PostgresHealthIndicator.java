@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.concurrent.Executor;
 
 /**
  * Custom health indicator for PostgreSQL database connectivity.
@@ -24,6 +25,7 @@ public class PostgresHealthIndicator implements HealthIndicator {
 
     private static final String HEALTH_CHECK_QUERY = "SELECT 1";
     private static final int TIMEOUT_SECONDS = 3;
+    private static final Executor DIRECT_EXECUTOR = Runnable::run;
     
     private final DataSource dataSource;
 
@@ -37,7 +39,7 @@ public class PostgresHealthIndicator implements HealthIndicator {
             long startTime = System.currentTimeMillis();
             
             try (Connection connection = dataSource.getConnection()) {
-                connection.setNetworkTimeout(null, TIMEOUT_SECONDS * 1000);
+                connection.setNetworkTimeout(DIRECT_EXECUTOR, TIMEOUT_SECONDS * 1000);
                 
                 try (Statement statement = connection.createStatement();
                      ResultSet resultSet = statement.executeQuery(HEALTH_CHECK_QUERY)) {

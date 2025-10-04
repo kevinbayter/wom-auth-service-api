@@ -198,7 +198,7 @@ class PostgresHealthIndicatorTest {
         healthIndicator.health();
 
         // Then
-        verify(connection).setNetworkTimeout(isNull(), eq(3000));
+        verify(connection).setNetworkTimeout(any(), eq(3000));
     }
 
     @Test

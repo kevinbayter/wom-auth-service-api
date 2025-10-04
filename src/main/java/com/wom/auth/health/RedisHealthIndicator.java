@@ -40,22 +40,24 @@ public class RedisHealthIndicator implements HealthIndicator {
                         .build();
             }
             
-            String response = connectionFactory.getConnection().ping();
-            
-            long responseTime = System.currentTimeMillis() - startTime;
-            
-            if (PING_RESPONSE.equals(response)) {
-                return Health.up()
-                        .withDetail("cache", "Redis")
-                        .withDetail("status", "UP")
-                        .withDetail("responseTime", responseTime + "ms")
-                        .withDetail("ping", response)
-                        .build();
-            } else {
-                return Health.down()
-                        .withDetail("cache", "Redis")
-                        .withDetail("reason", "Unexpected ping response: " + response)
-                        .build();
+            try (var connection = connectionFactory.getConnection()) {
+                String response = connection.ping();
+                
+                long responseTime = System.currentTimeMillis() - startTime;
+                
+                if (PING_RESPONSE.equals(response)) {
+                    return Health.up()
+                            .withDetail("cache", "Redis")
+                            .withDetail("status", "UP")
+                            .withDetail("responseTime", responseTime + "ms")
+                            .withDetail("ping", response)
+                            .build();
+                } else {
+                    return Health.down()
+                            .withDetail("cache", "Redis")
+                            .withDetail("reason", "Unexpected ping response: " + response)
+                            .build();
+                }
             }
         } catch (Exception e) {
             return Health.down()
