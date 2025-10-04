@@ -49,7 +49,7 @@
 
 ### ¿Por qué este proyecto?
 
-Este proyecto fue desarrollado como prueba técnica para demostrar capacidades de desarrollo **Senior Backend**, aplicando:
+Este proyecto fue desarrollado como prueba técnica para **Especialista de Aplicaciones Frontend** en WOM, aplicando mejores prácticas de desarrollo:
 
 - [x] **Principios SOLID** en toda la arquitectura
 - [x] **Clean Code** (métodos <20 líneas, nombres descriptivos, DRY)
