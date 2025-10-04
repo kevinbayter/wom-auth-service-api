@@ -7,9 +7,6 @@
 ---
 
 ## 🚀 Estado del Proyecto
-
-[![Build Status](docs/images/build_status.png)](https://github.com/kevinbayter/wom-auth-service-api/actions/workflows/ci.yml)
-
 🚧 **Terminado** - Prueba Técnica WOM
 
 ---
