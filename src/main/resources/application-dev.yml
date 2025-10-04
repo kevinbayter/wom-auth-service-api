@@ -5,14 +5,14 @@ spring:
 
   # Base de datos local con Docker
   datasource:
-    url: jdbc:postgresql://localhost:5432/wom_auth_db
-    username: wom_user
-    password: wom_password
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:wom_auth_db}
+    username: ${POSTGRES_USER:wom_user}
+    password: ${POSTGRES_PASSWORD:wom_password}
 
   # Redis local con Docker
   redis:
-    host: localhost
-    port: 6379
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
     password: ""
 
   # JPA - Mostrar SQL en desarrollo
