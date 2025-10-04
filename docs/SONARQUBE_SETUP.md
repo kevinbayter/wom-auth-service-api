@@ -37,11 +37,12 @@ docker run -d --name sonarqube \
 
 ### Required Secrets
 
-Add these secrets in GitHub repository settings:
+Add these secrets in GitHub repository settings (Settings → Secrets and variables → Actions → New repository secret):
 
 1. **SONAR_TOKEN**: Token generated from SonarQube
 2. **SONAR_HOST_URL**: Your SonarQube URL (e.g., https://sonarcloud.io or http://your-server:9000)
-3. **CODECOV_TOKEN**: Token from Codecov (optional)
+3. **NVD_API_KEY**: API Key from National Vulnerability Database (https://nvd.nist.gov/developers/request-an-api-key)
+4. **CODECOV_TOKEN**: Token from Codecov (optional)
 
 ### Using SonarCloud (Free for Open Source)
 
@@ -66,7 +67,15 @@ The pipeline enforces:
 Automatically scans for known vulnerabilities in dependencies.
 
 - **Threshold**: CVSS >= 7 (High and Critical)
+- **NVD API Key**: Required for accessing National Vulnerability Database
 - **Reports**: Available in GitHub Actions artifacts
+
+### Get NVD API Key
+
+1. Visit: https://nvd.nist.gov/developers/request-an-api-key
+2. Enter your email and request API key
+3. Check your email for the API key
+4. Add it as `NVD_API_KEY` secret in GitHub
 
 ## Trivy Security Scan
 

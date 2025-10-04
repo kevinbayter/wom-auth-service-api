@@ -110,8 +110,11 @@ jobs:
         run: ./mvnw jacoco:check
 
       - name: OWASP Dependency Check
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
           ./mvnw org.owasp:dependency-check-maven:check \
+            -DnvdApiKey=$NVD_API_KEY \
             -DfailBuildOnCVSS=7 \
             -DsuppressionFiles=owasp-suppressions.xml
 
