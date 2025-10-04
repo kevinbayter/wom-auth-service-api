@@ -1,0 +1,764 @@
+{
+	"info": {
+		"_postman_id": "wom-auth-service-2025",
+		"name": "WOM Auth Service API",
+		"description": "Colección completa de endpoints para el servicio de autenticación JWT con scripts automáticos para manejo dinámico de tokens.\n\n**Características:**\n- ✅ Login automático y guardado de tokens\n- ✅ Refresh token con rotación automática\n- ✅ Variables de entorno dinámicas\n- ✅ Tests automáticos en cada request\n- ✅ Validación de respuestas\n\n**Cómo usar:**\n1. Importar esta colección en Postman\n2. Ejecutar \"1. Login\" primero (guarda tokens automáticamente)\n3. Los demás endpoints usan los tokens guardados\n\n**Autor:** Kevin Bayter\n**Fecha:** Octubre 2025\n**Versión:** 1.0.0",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "1. Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validar status code",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Validar estructura de respuesta",
+									"pm.test(\"Response has required fields\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('accessToken');",
+									"    pm.expect(jsonData).to.have.property('refreshToken');",
+									"    pm.expect(jsonData).to.have.property('tokenType');",
+									"    pm.expect(jsonData).to.have.property('expiresIn');",
+									"});",
+									"",
+									"// Validar que tokenType sea Bearer",
+									"pm.test(\"Token type is Bearer\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.tokenType).to.eql('Bearer');",
+									"});",
+									"",
+									"// Validar que expiresIn sea 900 (15 minutos)",
+									"pm.test(\"Expires in 15 minutes (900s)\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.expiresIn).to.eql(900);",
+									"});",
+									"",
+									"// Guardar tokens en variables de entorno",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"access_token\", jsonData.accessToken);",
+									"    pm.environment.set(\"refresh_token\", jsonData.refreshToken);",
+									"    ",
+									"    console.log(\"✅ Access Token guardado:\", jsonData.accessToken.substring(0, 50) + \"...\");",
+									"    console.log(\"✅ Refresh Token guardado:\", jsonData.refreshToken.substring(0, 50) + \"...\");",
+									"}",
+									"",
+									"// Validar tiempo de respuesta < 1s",
+									"pm.test(\"Response time is less than 1000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"console.log(\"🔐 Iniciando login...\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"identifier\": \"admin@test.com\",\n  \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Autentica un usuario con email/username y contraseña.\n\n**Request Body:**\n- `identifier` (string, required): Email o username\n- `password` (string, required): Contraseña\n\n**Response:**\n- `accessToken`: Token JWT de corta duración (15 min)\n- `refreshToken`: Token para renovar access tokens (7 días)\n- `tokenType`: Siempre \"Bearer\"\n- `expiresIn`: Tiempo de expiración en segundos (900)\n\n**Scripts automáticos:**\n- ✅ Guarda `access_token` en variables de entorno\n- ✅ Guarda `refresh_token` en variables de entorno\n- ✅ Valida estructura de respuesta\n- ✅ Valida tiempo de respuesta"
+					},
+					"response": []
+				},
+				{
+					"name": "2. Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validar status code",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Validar estructura de respuesta",
+									"pm.test(\"Response has required fields\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('accessToken');",
+									"    pm.expect(jsonData).to.have.property('refreshToken');",
+									"    pm.expect(jsonData).to.have.property('tokenType');",
+									"    pm.expect(jsonData).to.have.property('expiresIn');",
+									"});",
+									"",
+									"// Validar Token Rotation (el nuevo refresh token debe ser diferente)",
+									"pm.test(\"Token Rotation: New refresh token is different\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var oldRefreshToken = pm.environment.get(\"refresh_token\");",
+									"    pm.expect(jsonData.refreshToken).to.not.eql(oldRefreshToken);",
+									"    console.log(\"✅ Token Rotation funcionando: Nuevo refresh token generado\");",
+									"});",
+									"",
+									"// Actualizar tokens con los nuevos valores",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    var oldAccessToken = pm.environment.get(\"access_token\");",
+									"    var oldRefreshToken = pm.environment.get(\"refresh_token\");",
+									"    ",
+									"    pm.environment.set(\"access_token\", jsonData.accessToken);",
+									"    pm.environment.set(\"refresh_token\", jsonData.refreshToken);",
+									"    ",
+									"    console.log(\"📝 Token anterior (Access):\", oldAccessToken.substring(0, 50) + \"...\");",
+									"    console.log(\"✅ Nuevo Access Token:\", jsonData.accessToken.substring(0, 50) + \"...\");",
+									"    console.log(\"📝 Token anterior (Refresh):\", oldRefreshToken.substring(0, 50) + \"...\");",
+									"    console.log(\"✅ Nuevo Refresh Token:\", jsonData.refreshToken.substring(0, 50) + \"...\");",
+									"}",
+									"",
+									"// Validar tiempo de respuesta",
+									"pm.test(\"Response time is less than 1000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Validar que existe un refresh token",
+									"var refreshToken = pm.environment.get(\"refresh_token\");",
+									"if (!refreshToken) {",
+									"    console.error(\"❌ Error: No hay refresh_token. Ejecuta '1. Login' primero.\");",
+									"} else {",
+									"    console.log(\"🔄 Renovando tokens...\");",
+									"    console.log(\"Refresh token a usar:\", refreshToken.substring(0, 50) + \"...\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						},
+						"description": "Renueva un access token expirado usando un refresh token válido.\n\n**Importante:** Implementa **Token Rotation**. El refresh token antiguo se invalida y se genera uno nuevo.\n\n**Request Body:**\n- `refreshToken` (string, required): Refresh token obtenido en login o refresh previo\n\n**Response:**\n- Nuevos `accessToken` y `refreshToken`\n- El refresh token antiguo queda invalidado\n\n**Scripts automáticos:**\n- ✅ Actualiza `access_token` automáticamente\n- ✅ Actualiza `refresh_token` automáticamente\n- ✅ Valida Token Rotation (nuevo token ≠ anterior)\n- ✅ Logs detallados de rotación"
+					},
+					"response": []
+				},
+				{
+					"name": "3. Get Current User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validar status code",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Validar estructura de respuesta",
+									"pm.test(\"Response has user fields\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('email');",
+									"    pm.expect(jsonData).to.have.property('username');",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"    pm.expect(jsonData).to.have.property('createdAt');",
+									"});",
+									"",
+									"// Validar que el usuario esté activo",
+									"pm.test(\"User status is ACTIVE\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('ACTIVE');",
+									"});",
+									"",
+									"// Validar email",
+									"pm.test(\"User email is admin@test.com\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.email).to.eql('admin@test.com');",
+									"});",
+									"",
+									"// Mostrar información del usuario",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    console.log(\"👤 Usuario autenticado:\");",
+									"    console.log(\"  - ID:\", jsonData.id);",
+									"    console.log(\"  - Email:\", jsonData.email);",
+									"    console.log(\"  - Username:\", jsonData.username);",
+									"    console.log(\"  - Status:\", jsonData.status);",
+									"    console.log(\"  - Último login:\", jsonData.lastLoginAt);",
+									"}",
+									"",
+									"// Validar tiempo de respuesta",
+									"pm.test(\"Response time is less than 500ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Validar que existe un access token",
+									"var accessToken = pm.environment.get(\"access_token\");",
+									"if (!accessToken) {",
+									"    console.error(\"❌ Error: No hay access_token. Ejecuta '1. Login' primero.\");",
+									"} else {",
+									"    console.log(\"✅ Obteniendo perfil del usuario...\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						},
+						"description": "Obtiene la información del usuario autenticado actualmente.\n\n**Autenticación:** Requiere Bearer token en header `Authorization`\n\n**Response:**\n- `id`: ID del usuario\n- `email`: Email del usuario\n- `username`: Nombre de usuario\n- `fullName`: Nombre completo\n- `status`: Estado (ACTIVE, LOCKED, etc.)\n- `lastLoginAt`: Fecha/hora del último login\n- `createdAt`: Fecha/hora de creación de la cuenta\n\n**Scripts automáticos:**\n- ✅ Usa `access_token` de variables de entorno\n- ✅ Valida estructura de respuesta\n- ✅ Valida que el usuario esté ACTIVE\n- ✅ Muestra información en consola"
+					},
+					"response": []
+				},
+				{
+					"name": "4. Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validar status code",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Validar mensaje de éxito",
+									"pm.test(\"Logout successful message\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.eql('Logged out successfully');",
+									"});",
+									"",
+									"// Información de logout",
+									"console.log(\"✅ Logout exitoso\");",
+									"console.log(\"⚠️ El access_token y refresh_token han sido invalidados\");",
+									"console.log(\"💡 Para continuar, ejecuta '1. Login' nuevamente\");",
+									"",
+									"// Validar tiempo de respuesta",
+									"pm.test(\"Response time is less than 500ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Validar que existe un access token",
+									"var accessToken = pm.environment.get(\"access_token\");",
+									"if (!accessToken) {",
+									"    console.error(\"❌ Error: No hay access_token. Ejecuta '1. Login' primero.\");",
+									"} else {",
+									"    console.log(\"🚪 Cerrando sesión...\");",
+									"    console.log(\"Token a invalidar:\", accessToken.substring(0, 50) + \"...\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Cierra la sesión del usuario actual.\n\n**Efecto:**\n- Invalida el `access_token` (se agrega a blacklist en Redis)\n- Invalida el `refresh_token` asociado\n- El usuario debe hacer login nuevamente\n\n**Autenticación:** Requiere Bearer token válido\n\n**Response:**\n- `message`: \"Logged out successfully\"\n\n**Scripts automáticos:**\n- ✅ Usa `access_token` de variables de entorno\n- ✅ Valida logout exitoso\n- ✅ Muestra advertencia de tokens invalidados"
+					},
+					"response": []
+				},
+				{
+					"name": "5. Logout All Devices",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validar status code",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Validar mensaje de éxito",
+									"pm.test(\"Logout all devices successful\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.eql('Logged out from all devices');",
+									"});",
+									"",
+									"// Información de logout",
+									"console.log(\"✅ Logout exitoso de TODOS los dispositivos\");",
+									"console.log(\"⚠️ TODOS los refresh tokens del usuario han sido revocados\");",
+									"console.log(\"🔒 Todas las sesiones activas han sido cerradas\");",
+									"console.log(\"💡 Para continuar, ejecuta '1. Login' nuevamente\");",
+									"",
+									"// Validar tiempo de respuesta",
+									"pm.test(\"Response time is less than 500ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Validar que existe un access token",
+									"var accessToken = pm.environment.get(\"access_token\");",
+									"if (!accessToken) {",
+									"    console.error(\"❌ Error: No hay access_token. Ejecuta '1. Login' primero.\");",
+									"} else {",
+									"    console.log(\"🚪🚪🚪 Cerrando sesión en TODOS los dispositivos...\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/logout-all",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout-all"
+							]
+						},
+						"description": "Cierra la sesión del usuario en TODOS los dispositivos.\n\n**Efecto:**\n- Revoca **TODOS** los refresh tokens del usuario\n- Cierra todas las sesiones activas\n- Útil para emergencias (pérdida de dispositivo, sospecha de compromiso)\n\n**Autenticación:** Requiere Bearer token válido\n\n**Response:**\n- `message`: \"Logged out from all devices\"\n\n**Caso de uso:**\n- Usuario perdió su teléfono\n- Sospecha de cuenta comprometida\n- Cambio de contraseña\n\n**Scripts automáticos:**\n- ✅ Usa `access_token` de variables de entorno\n- ✅ Valida logout masivo exitoso\n- ✅ Advertencias de seguridad en consola"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de autenticación y gestión de sesión.\n\n**Flujo recomendado:**\n1. **Login** → Obtiene access_token y refresh_token\n2. **Get Current User** → Verifica token y obtiene datos\n3. **Refresh Token** → Renueva tokens cuando expiren\n4. **Logout** → Cierra sesión en dispositivo actual\n5. **Logout All Devices** → Cierra sesión en todos los dispositivos"
+		},
+		{
+			"name": "Health & Monitoring",
+			"item": [
+				{
+					"name": "Health Check",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validar status code",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Validar estado UP",
+									"pm.test(\"Application status is UP\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('UP');",
+									"});",
+									"",
+									"// Validar PostgreSQL UP",
+									"pm.test(\"PostgreSQL is UP\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.components.postgres.status).to.eql('UP');",
+									"});",
+									"",
+									"// Validar Redis UP",
+									"pm.test(\"Redis is UP\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.components.redis.status).to.eql('UP');",
+									"});",
+									"",
+									"// Mostrar información detallada",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    console.log(\"✅ Application Status:\", jsonData.status);",
+									"    ",
+									"    if (jsonData.components.postgres) {",
+									"        console.log(\"🐘 PostgreSQL:\", jsonData.components.postgres.status);",
+									"        console.log(\"   Response Time:\", jsonData.components.postgres.details.responseTime);",
+									"    }",
+									"    ",
+									"    if (jsonData.components.redis) {",
+									"        console.log(\"🔴 Redis:\", jsonData.components.redis.status);",
+									"        console.log(\"   Response Time:\", jsonData.components.redis.details.responseTime);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/actuator/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actuator",
+								"health"
+							]
+						},
+						"description": "Verifica el estado de salud de la aplicación y sus dependencias.\n\n**Componentes monitoreados:**\n- PostgreSQL (base de datos)\n- Redis (cache y blacklist)\n- Disk Space\n- Liveness State\n- Readiness State\n\n**Response:**\n- `status`: Estado general (UP/DOWN)\n- `components`: Estado individual de cada componente\n- `details`: Información adicional (tiempos de respuesta, etc.)"
+					},
+					"response": []
+				},
+				{
+					"name": "Prometheus Metrics",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validar status code",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Validar formato Prometheus",
+									"pm.test(\"Response is in Prometheus format\", function () {",
+									"    var responseText = pm.response.text();",
+									"    pm.expect(responseText).to.include('# HELP');",
+									"    pm.expect(responseText).to.include('# TYPE');",
+									"});",
+									"",
+									"// Buscar métricas custom de autenticación",
+									"pm.test(\"Contains custom auth metrics\", function () {",
+									"    var responseText = pm.response.text();",
+									"    pm.expect(responseText).to.include('auth_login');",
+									"});",
+									"",
+									"console.log(\"📊 Métricas Prometheus disponibles\");",
+									"console.log(\"✅ Formato validado correctamente\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/actuator/prometheus",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actuator",
+								"prometheus"
+							]
+						},
+						"description": "Exporta métricas en formato Prometheus.\n\n**Métricas Custom:**\n- `auth_login_success_total`: Logins exitosos\n- `auth_login_failure_total`: Logins fallidos\n- `auth_refresh_success_total`: Refresh exitosos\n- `auth_refresh_failure_total`: Refresh fallidos\n- `auth_logout_total`: Cantidad de logouts\n- `auth_login_latency_seconds`: Latencia de login (P50, P95, P99)\n- `auth_refresh_latency_seconds`: Latencia de refresh (P50, P95, P99)\n\n**Métricas JVM:**\n- Memoria (heap, non-heap)\n- Threads\n- GC (Garbage Collection)\n- HTTP requests\n\n**Uso:**\nEstas métricas pueden ser scrapeadas por Prometheus y visualizadas en Grafana."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de monitoreo y observabilidad.\n\n**Health Check:** Valida que la aplicación y sus dependencias estén funcionando.\n**Prometheus:** Exporta métricas para monitoreo avanzado."
+		},
+		{
+			"name": "Error Cases",
+			"item": [
+				{
+					"name": "Login - Invalid Credentials",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validar status code 401",
+									"pm.test(\"Status code is 401 Unauthorized\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"// Validar mensaje de error",
+									"pm.test(\"Error message is 'Invalid credentials'\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.eql('Invalid credentials');",
+									"});",
+									"",
+									"// Validar estructura de error",
+									"pm.test(\"Error response has required fields\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('path');",
+									"    pm.expect(jsonData).to.have.property('error');",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData).to.have.property('timestamp');",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"});",
+									"",
+									"console.log(\"❌ Login fallido: Credenciales inválidas\");",
+									"console.log(\"⚠️ Esto incrementa el contador de intentos fallidos\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"identifier\": \"admin@test.com\",\n  \"password\": \"wrongpassword\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Test de error: Login con credenciales incorrectas.\n\n**Comportamiento esperado:**\n- Status: 401 Unauthorized\n- Message: \"Invalid credentials\"\n- Incrementa contador de intentos fallidos\n- Después de 5 intentos fallidos → cuenta bloqueada 30 minutos"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User - No Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validar status code 401",
+									"pm.test(\"Status code is 401 Unauthorized\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"console.log(\"❌ Acceso denegado: No se proporcionó token de autenticación\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						},
+						"description": "Test de error: Acceso sin autenticación.\n\n**Comportamiento esperado:**\n- Status: 401 Unauthorized\n- El endpoint rechaza la petición sin token"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh - Invalid Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validar status code 401",
+									"pm.test(\"Status code is 401 Unauthorized\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"// Validar mensaje de error",
+									"pm.test(\"Error message contains 'Invalid' or 'expired'\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var message = jsonData.message.toLowerCase();",
+									"    var isValid = message.includes('invalid') || message.includes('expired') || message.includes('malformed');",
+									"    pm.expect(isValid).to.be.true;",
+									"});",
+									"",
+									"console.log(\"❌ Refresh fallido: Token inválido o expirado\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"invalid.token.here\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						},
+						"description": "Test de error: Refresh con token inválido.\n\n**Comportamiento esperado:**\n- Status: 401 Unauthorized\n- Message: \"Invalid refresh token\" o \"Malformed JWT\"\n- No se generan nuevos tokens"
+					},
+					"response": []
+				}
+			],
+			"description": "Casos de error para validar el manejo de excepciones.\n\n**Incluye:**\n- Login con credenciales incorrectas\n- Acceso sin autenticación\n- Refresh con token inválido"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Script global ejecutado antes de cada request",
+					"console.log(\"========================================\");",
+					"console.log(\"🚀 WOM Auth Service API - Postman Collection\");",
+					"console.log(\"========================================\");"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Script global ejecutado después de cada request",
+					"console.log(\"========================================\");",
+					"console.log(\"⏱️ Response Time:\", pm.response.responseTime + \"ms\");",
+					"console.log(\"📊 Status Code:\", pm.response.code);",
+					"console.log(\"========================================\");"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

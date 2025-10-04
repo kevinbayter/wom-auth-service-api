@@ -34,15 +34,16 @@
    - [Autenticación](#autenticación)
    - [Ejemplos de Uso con cURL](#ejemplos-de-uso-con-curl)
 10. [Documentación Swagger](#-documentación-swagger)
-11. [Testing](#-testing)
-12. [Monitoreo y Métricas](#-monitoreo-y-métricas)
-13. [Seguridad](#-seguridad)
-14. [CI/CD](#-cicd)
-15. [Estructura del Proyecto](#-estructura-del-proyecto)
-16. [Roadmap](#-roadmap)
-17. [Contribución](#-contribución)
-18. [Licencia](#-licencia)
-19. [Contacto](#-contacto)
+11. [Colección de Postman](#-colección-de-postman)
+12. [Testing](#-testing)
+13. [Monitoreo y Métricas](#-monitoreo-y-métricas)
+14. [Seguridad](#-seguridad)
+15. [CI/CD](#-cicd)
+16. [Estructura del Proyecto](#-estructura-del-proyecto)
+17. [Roadmap](#-roadmap)
+18. [Contribución](#-contribución)
+19. [Licencia](#-licencia)
+20. [Contacto](#-contacto)
 
 ---
 
@@ -909,6 +910,153 @@ Una vez la aplicación esté corriendo, accede a:
 Especificación OpenAPI 3.0 disponible en:
 - **JSON**: http://localhost:8080/v3/api-docs
 - **YAML**: http://localhost:8080/v3/api-docs.yaml
+
+---
+
+## 📬 Colección de Postman
+
+### Importar Colección
+
+El proyecto incluye una **colección completa de Postman** con todos los endpoints y scripts automáticos para manejo dinámico de tokens.
+
+**📦 Archivos incluidos:**
+- `WOM_Auth_Service_API.postman_collection.json` - Colección de requests
+- `WOM_Auth_Service_API.postman_environment.json` - Variables de entorno
+
+### Características de la Colección
+
+✅ **Manejo automático de tokens**
+- Login guarda `access_token` y `refresh_token` automáticamente
+- Refresh actualiza tokens dinámicamente
+- No necesitas copiar/pegar tokens manualmente
+
+✅ **Tests automáticos en cada request**
+- Validación de status codes
+- Validación de estructura de respuesta
+- Verificación de Token Rotation
+- Logs detallados en consola de Postman
+
+✅ **Casos de prueba incluidos**
+- Happy path (login, get user, refresh, logout)
+- Error cases (credenciales inválidas, sin token, token inválido)
+- Health checks y métricas
+
+### Cómo Usar
+
+#### **Paso 1: Importar en Postman**
+
+1. Abrir Postman
+2. Click en **Import** (esquina superior izquierda)
+3. Arrastrar los 2 archivos JSON:
+   - `WOM_Auth_Service_API.postman_collection.json`
+   - `WOM_Auth_Service_API.postman_environment.json`
+4. Click en **Import**
+
+#### **Paso 2: Activar el Environment**
+
+1. En Postman, click en el dropdown de environments (arriba a la derecha)
+2. Seleccionar **"WOM Auth Service - Local"**
+3. Verificar que `base_url` esté en `http://localhost:8080`
+
+#### **Paso 3: Ejecutar Requests**
+
+**Orden recomendado:**
+
+1. **Authentication → 1. Login**
+   - Ejecutar (Cmd/Ctrl + Enter)
+   - ✅ Guarda `access_token` y `refresh_token` automáticamente
+   - Ver logs en consola de Postman
+
+2. **Authentication → 3. Get Current User**
+   - ✅ Usa `access_token` automáticamente
+   - Muestra información del usuario en consola
+
+3. **Authentication → 2. Refresh Token**
+   - ✅ Usa `refresh_token` automáticamente
+   - ✅ Actualiza ambos tokens (Token Rotation)
+   - Ver logs de rotación en consola
+
+4. **Authentication → 4. Logout**
+   - Invalida tokens actuales
+   - Para continuar, ejecutar "1. Login" nuevamente
+
+#### **Paso 4: Ejecutar toda la Colección**
+
+Puedes ejecutar todos los requests automáticamente:
+
+1. Click derecho en la colección **"WOM Auth Service API"**
+2. Seleccionar **"Run collection"**
+3. Click en **"Run WOM Auth Service API"**
+4. Ver resultados de todos los tests
+
+### Scripts Automáticos Incluidos
+
+Cada request incluye scripts Pre-request y Tests:
+
+**Pre-request Scripts:**
+```javascript
+// Valida que existan tokens cuando se requieren
+// Muestra logs informativos
+console.log("🔐 Iniciando login...");
+```
+
+**Test Scripts:**
+```javascript
+// Guarda tokens automáticamente
+pm.environment.set("access_token", jsonData.accessToken);
+pm.environment.set("refresh_token", jsonData.refreshToken);
+
+// Valida respuestas
+pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+});
+
+// Valida Token Rotation
+pm.test("Token Rotation: New refresh token is different", function () {
+    var oldRefreshToken = pm.environment.get("refresh_token");
+    pm.expect(jsonData.refreshToken).to.not.eql(oldRefreshToken);
+});
+```
+
+### Variables de Entorno
+
+El environment incluye:
+
+| Variable | Valor por Defecto | Descripción |
+|----------|-------------------|-------------|
+| `base_url` | `http://localhost:8080` | URL base de la API |
+| `access_token` | (auto) | Se actualiza automáticamente en login/refresh |
+| `refresh_token` | (auto) | Se actualiza automáticamente en login/refresh |
+| `user_email` | `admin@test.com` | Email de prueba |
+| `user_password` | `password` | Contraseña de prueba |
+
+### Carpetas de la Colección
+
+1. **Authentication** (5 requests)
+   - Login
+   - Refresh Token
+   - Get Current User
+   - Logout
+   - Logout All Devices
+
+2. **Health & Monitoring** (2 requests)
+   - Health Check
+   - Prometheus Metrics
+
+3. **Error Cases** (3 requests)
+   - Login - Invalid Credentials
+   - Get User - No Token
+   - Refresh - Invalid Token
+
+### Tips
+
+💡 **Ver logs detallados:** Abre la consola de Postman (View → Show Postman Console)
+
+💡 **Ejecutar requests rápido:** Usa `Cmd/Ctrl + Enter`
+
+💡 **Variables de entorno:** Accede con `{{variable_name}}` en cualquier parte del request
+
+💡 **Cambiar servidor:** Edita `base_url` en el environment para apuntar a otro servidor
 
 ---
 
