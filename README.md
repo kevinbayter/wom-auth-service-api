@@ -626,7 +626,7 @@ Este proyecto es parte de una prueba técnica para WOM.
 
 ⭐️ **Desarrollado con Clean Code, SOLID y mejores prácticas enterprise**
 
-Esta es la forma **más rápida y sencilla** de levantar todo el proyecto.
+Esta es la forma **más rápida y sencilla** de levantar todo el proyecto. **Funciona "out of the box"** sin necesidad de configuración adicional.
 
 #### **Paso 1: Clonar el repositorio**
 ```bash
@@ -634,16 +634,7 @@ git clone https://github.com/kevinbayter/wom-auth-service-api.git
 cd wom-auth-service-api
 ```
 
-#### **Paso 2: Configurar variables de entorno (Opcional)**
-```bash
-# Copiar archivo de ejemplo
-cp .env.example .env
-
-# Editar .env si es necesario (valores por defecto funcionan)
-nano .env
-```
-
-#### **Paso 3: Levantar todo el stack**
+#### **Paso 2: Levantar todo el stack**
 ```bash
 # Construir y levantar todos los servicios
 docker-compose up -d --build
@@ -652,7 +643,9 @@ docker-compose up -d --build
 docker-compose logs -f app
 ```
 
-#### **Paso 4: Verificar que todo esté funcionando**
+> **📌 Nota**: El archivo `.env` ya está incluido en el repositorio con valores preconfigurados para desarrollo. No necesitas crear ni modificar nada.
+
+#### **Paso 3: Verificar que todo esté funcionando**
 ```bash
 # Verificar estado de contenedores
 docker-compose ps
@@ -668,7 +661,7 @@ curl http://localhost:8080/actuator/health
 # Debe retornar: {"status":"UP"}
 ```
 
-#### **Paso 5: Acceder a la aplicación**
+#### **Paso 4: Acceder a la aplicación**
 - **API Base URL**: http://localhost:8080
 - **Swagger UI**: http://localhost:8080/swagger-ui/index.html
 - **Health Check**: http://localhost:8080/actuator/health
@@ -758,23 +751,37 @@ curl http://localhost:8080/actuator/health
 
 ### Variables de Entorno
 
-El proyecto soporta configuración a través de variables de entorno. Valores por defecto en `application.yml`:
+El proyecto incluye un archivo `.env` **ya configurado** en el repositorio con valores para desarrollo. No necesitas crear ni configurar nada para empezar.
+
+**📌 Importante**: El archivo `.env` está incluido en el repositorio para facilitar la ejecución "out of the box". En un entorno de producción, este archivo debería estar en `.gitignore` y las variables configurarse mediante secretos o servicios de configuración externos.
 
 | Variable | Valor por Defecto | Descripción |
 |----------|-------------------|-------------|
-| `POSTGRES_HOST` | `localhost` | Host de PostgreSQL |
+| `POSTGRES_HOST` | `postgres` | Host de PostgreSQL (nombre del servicio en Docker) |
 | `POSTGRES_PORT` | `5432` | Puerto de PostgreSQL |
 | `POSTGRES_DB` | `wom_auth_db` | Nombre de la base de datos |
 | `POSTGRES_USER` | `wom_user` | Usuario de PostgreSQL |
 | `POSTGRES_PASSWORD` | `wom_password` | Contraseña de PostgreSQL |
-| `REDIS_HOST` | `localhost` | Host de Redis |
+| `REDIS_HOST` | `redis` | Host de Redis (nombre del servicio en Docker) |
 | `REDIS_PORT` | `6379` | Puerto de Redis |
-| `REDIS_PASSWORD` | _(vacío)_ | Contraseña de Redis |
 | `JWT_ACCESS_TOKEN_EXPIRATION` | `900000` | Expiración access token (15 min) |
 | `JWT_REFRESH_TOKEN_EXPIRATION` | `604800000` | Expiración refresh token (7 días) |
 | `MAX_LOGIN_ATTEMPTS` | `5` | Intentos antes de bloqueo |
 | `ACCOUNT_LOCK_DURATION` | `30` | Duración del bloqueo (minutos) |
-| `CORS_ALLOWED_ORIGINS` | `http://localhost:4200` | Orígenes permitidos por CORS |
+| `CORS_ALLOWED_ORIGINS` | `http://localhost:4200,http://localhost:3000` | Orígenes permitidos por CORS |
+
+### Modificar Configuración (Opcional)
+
+Si necesitas cambiar alguna configuración, simplemente edita el archivo `.env`:
+
+```bash
+# Editar variables de entorno
+nano .env
+
+# Reiniciar servicios para aplicar cambios
+docker-compose down
+docker-compose up -d --build
+```
 
 ### Perfiles de Spring
 
@@ -798,7 +805,7 @@ java -jar -Dspring.profiles.active=prod target/wom-auth-service-api-1.0.0.jar
 
 ### Configuración de JWT (RS256)
 
-El proyecto usa claves RSA para firmar tokens JWT. Las claves ya están generadas en `src/main/resources/keys/`:
+El proyecto usa claves RSA para firmar tokens JWT. **Las claves ya están incluidas** en el repositorio en `src/main/resources/keys/` para facilitar la ejecución inmediata:
 
 ```
 keys/
@@ -806,15 +813,21 @@ keys/
 └── public_key.pem   (verificación de tokens)
 ```
 
-**Para generar nuevas claves** (solo si es necesario):
+> **⚠️ ADVERTENCIA DE SEGURIDAD**: Las claves RSA incluidas son **SOLO PARA DESARROLLO**. En producción, debes:
+> 1. Generar nuevas claves RSA únicas
+> 2. Almacenarlas en un gestor de secretos (AWS Secrets Manager, Azure Key Vault, HashiCorp Vault)
+> 3. Excluirlas del control de versiones (agregarlas a `.gitignore`)
+> 4. Nunca compartir ni exponer las claves privadas
+
+**Para generar nuevas claves** (recomendado para producción):
 ```bash
-# Generar clave privada
+# Generar clave privada RSA de 2048 bits
 openssl genrsa -out private_key.pem 2048
 
-# Generar clave pública
+# Generar clave pública correspondiente
 openssl rsa -in private_key.pem -pubout -out public_key.pem
 
-# Mover a resources
+# Mover a resources (solo en desarrollo local)
 mv private_key.pem public_key.pem src/main/resources/keys/
 ```
 
