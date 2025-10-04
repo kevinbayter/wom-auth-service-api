@@ -923,6 +923,8 @@ El proyecto incluye una **colección completa de Postman** con todos los endpoin
 - `WOM_Auth_Service_API.postman_collection.json` - Colección de requests
 - `WOM_Auth_Service_API.postman_environment.json` - Variables de entorno
 
+> 📖 **Documentación detallada**: Ver [POSTMAN_COLLECTION.md](POSTMAN_COLLECTION.md) para guía completa con ejemplos, troubleshooting y casos de uso
+
 ### Características de la Colección
 
 ✅ **Manejo automático de tokens**
@@ -936,10 +938,10 @@ El proyecto incluye una **colección completa de Postman** con todos los endpoin
 - Verificación de Token Rotation
 - Logs detallados en consola de Postman
 
-✅ **Casos de prueba incluidos**
-- Happy path (login, get user, refresh, logout)
-- Error cases (credenciales inválidas, sin token, token inválido)
-- Health checks y métricas
+✅ **15 requests organizados en 3 categorías**
+- **Happy Path** (5): Login exitoso, get user, refresh, logout, logout all devices
+- **Monitoring** (2): Health checks y métricas Prometheus
+- **Error Handling** (3): Tests de seguridad para validar manejo correcto de errores
 
 ### Cómo Usar
 
@@ -1043,10 +1045,12 @@ El environment incluye:
    - Health Check
    - Prometheus Metrics
 
-3. **Error Cases** (3 requests)
-   - Login - Invalid Credentials
-   - Get User - No Token
-   - Refresh - Invalid Token
+3. **Error Cases** (3 requests) - *Tests de manejo de errores*
+   - Login - Invalid Credentials (verifica respuesta 401 con password incorrecto)
+   - Get User - No Token (verifica rechazo sin autenticación)
+   - Refresh - Invalid Token (verifica validación de tokens malformados)
+
+> 💡 **Nota sobre Error Cases**: Estos requests están diseñados para **fallar intencionalmente** y verificar que la API maneja correctamente los errores. Son parte de las pruebas de seguridad.
 
 ### Tips
 
