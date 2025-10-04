@@ -31,12 +31,12 @@ Thumbs.db
 # Maven
 # (Maven wrapper incluido intencionalmente en el repo para CI/CD)
 
-# Claves privadas (NUNCA commitear)
-*.pem
-*.key
+# Claves privadas de PRODUCCIÓN (NUNCA commitear)
+# NOTA: Las claves en src/main/resources/keys/ son SOLO para desarrollo/demo
+# y están incluidas en el repo para facilitar el setup inicial.
+# En producción, generar nuevas claves y usar gestores de secretos.
 *.p12
 *.jks
-src/main/resources/keys/private_key.pem
 
 # Tests
 test-output/
