@@ -840,6 +840,18 @@ mv private_key.pem public_key.pem src/main/resources/keys/
 http://localhost:8080
 ```
 
+### Credenciales de Prueba
+
+El proyecto incluye usuarios de prueba pre-creados:
+
+| Email | Username | Password | Status |
+|-------|----------|----------|--------|
+| `admin@test.com` | `admin` | `password` | ACTIVE |
+| `user@test.com` | `testuser` | `password` | ACTIVE |
+| `locked@test.com` | `lockeduser` | `password` | LOCKED |
+
+> **📌 Nota**: Usa `admin@test.com` con contraseña `password` para las pruebas.
+
 ### Autenticación
 
 Todos los endpoints excepto `/auth/login` y `/auth/refresh` requieren token JWT en el header:
@@ -861,8 +873,8 @@ POST /auth/login
 **Request Body:**
 ```json
 {
-  "identifier": "admin@wom.com",
-  "password": "Admin123!"
+  "identifier": "admin@test.com",
+  "password": "password"
 }
 ```
 
@@ -988,7 +1000,7 @@ Authorization: Bearer <access_token>
 ```json
 {
   "id": 1,
-  "email": "admin@wom.com",
+  "email": "admin@test.com",
   "username": "admin",
   "status": "ACTIVE",
   "createdAt": "2025-10-01T10:00:00",
@@ -1009,8 +1021,8 @@ Authorization: Bearer <access_token>
 curl -X POST http://localhost:8080/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "identifier": "admin@wom.com",
-    "password": "Admin123!"
+    "identifier": "admin@test.com",
+    "password": "password"
   }'
 ```
 
@@ -1056,8 +1068,8 @@ echo "=== Login ==="
 LOGIN_RESPONSE=$(curl -s -X POST http://localhost:8080/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "identifier": "admin@wom.com",
-    "password": "Admin123!"
+    "identifier": "admin@test.com",
+    "password": "password"
   }')
 
 echo $LOGIN_RESPONSE | jq .
@@ -1116,8 +1128,8 @@ Una vez la aplicación esté corriendo, accede a:
    - Ingresar credenciales:
      ```json
      {
-       "identifier": "admin@wom.com",
-       "password": "Admin123!"
+       "identifier": "admin@test.com",
+       "password": "password"
      }
      ```
    - Click en "Execute"
@@ -1710,7 +1722,7 @@ open http://localhost:8080/swagger-ui/index.html
 # Login de prueba
 curl -X POST http://localhost:8080/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"identifier": "admin@wom.com", "password": "Admin123!"}'
+  -d '{"identifier": "admin@test.com", "password": "password"}'
 
 # ¡Listo! 🎉
 ```
