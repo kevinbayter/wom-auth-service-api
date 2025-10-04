@@ -1,7 +1,8 @@
-package com.wom.auth.controller;
+package com.wom.auth.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wom.auth.config.JpaAuditingConfig;
+import com.wom.auth.controller.AuthController;
 import com.wom.auth.dto.LoginRequest;
 import com.wom.auth.dto.LoginResponse;
 import com.wom.auth.dto.RefreshTokenRequest;
@@ -72,7 +73,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration"
 })
 @Import(GlobalExceptionHandler.class)
-class AuthControllerTest {
+class AuthControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
