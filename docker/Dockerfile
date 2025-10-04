@@ -1,5 +1,5 @@
 # Build stage
-FROM maven:3.8.6-openjdk-8-slim AS build
+FROM maven:3.9-amazoncorretto-17-alpine AS build
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Runtime stage
-FROM openjdk:8-jre-alpine
+FROM amazoncorretto:17-alpine
 
 WORKDIR /app
 

@@ -322,7 +322,7 @@ class AuthControllerIntegrationTest {
         user.setEmail("test@example.com");
         user.setCreatedAt(LocalDateTime.now());
 
-        when(userService.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(userService.findByEmailOrUsername("testuser")).thenReturn(Optional.of(user));
 
         // Act & Assert
         mockMvc.perform(get("/auth/me")
@@ -337,7 +337,7 @@ class AuthControllerIntegrationTest {
     @WithMockUser(username = "nonexistent")
     void getCurrentUser_WithNonExistentUser_ShouldReturn404() throws Exception {
         // Arrange
-        when(userService.findByUsername("nonexistent")).thenReturn(Optional.empty());
+        when(userService.findByEmailOrUsername("nonexistent")).thenReturn(Optional.empty());
 
         // Act & Assert
         mockMvc.perform(get("/auth/me")

@@ -6,7 +6,6 @@ import com.wom.auth.exception.InvalidTokenException;
 import com.wom.auth.exception.TokenExpiredException;
 import com.wom.auth.service.JwtService;
 import com.wom.auth.service.TokenService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,7 +29,6 @@ import java.util.Map;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
@@ -115,6 +113,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         errorDetails.put("message", message);
         errorDetails.put("path", request.getRequestURI());
 
-        objectMapper.writeValue(response.getWriter(), errorDetails);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.writeValue(response.getWriter(), errorDetails);
     }
 }

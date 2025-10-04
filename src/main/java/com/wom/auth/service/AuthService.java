@@ -14,6 +14,7 @@ import java.util.Optional;
 
 /**
  * Service for authentication operations.
+ * Handles login, token refresh, and logout with metrics recording.
  */
 @Service
 public class AuthService {
@@ -33,6 +34,16 @@ public class AuthService {
         this.metricsService = metricsService;
     }
 
+    /**
+     * Authenticates a user with credentials.
+     * Manages failed attempts and account locking (5 attempts = 30 min lock).
+     *
+     * @param identifier user's email or username
+     * @param password plain text password
+     * @return LoginResponse with access and refresh tokens
+     * @throws InvalidCredentialsException if credentials invalid or account inactive
+     * @throws AccountLockedException if account locked due to failed attempts
+     */
     @Transactional
     public LoginResponse authenticate(String identifier, String password) {
         return metricsService.recordLoginOperation(() -> {
@@ -74,6 +85,14 @@ public class AuthService {
         });
     }
 
+    /**
+     * Refreshes access token using valid refresh token.
+     * Implements token rotation by invalidating old refresh token.
+     *
+     * @param refreshToken current valid refresh token
+     * @return LoginResponse with new access and refresh tokens
+     * @throws IllegalArgumentException if token invalid, expired, or user not found
+     */
     @Transactional
     public LoginResponse refreshAccessToken(String refreshToken) {
         return metricsService.recordRefreshOperation(() -> {
@@ -113,6 +132,11 @@ public class AuthService {
         });
     }
 
+    /**
+     * Logs out user by blacklisting access token and revoking refresh token.
+     *
+     * @param accessToken current access token to invalidate
+     */
     @Transactional
     public void logout(String accessToken) {
         metricsService.recordLogout();
@@ -133,6 +157,11 @@ public class AuthService {
         }
     }
 
+    /**
+     * Logs out user from all devices by revoking all refresh tokens.
+     *
+     * @param accessToken current access token to identify user
+     */
     @Transactional
     public void logoutAllDevices(String accessToken) {
         metricsService.recordLogout();

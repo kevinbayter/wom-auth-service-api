@@ -7,9 +7,9 @@ spring:
 
   # Configuración de Base de Datos
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:wom_auth_db}
-    username: ${DB_USERNAME:wom_user}
-    password: ${DB_PASSWORD:wom_password}
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:wom_auth_db}
+    username: ${POSTGRES_USER:wom_user}
+    password: ${POSTGRES_PASSWORD:wom_password}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
