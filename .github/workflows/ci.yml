@@ -110,12 +110,10 @@ jobs:
         run: ./mvnw jacoco:check
 
       - name: OWASP Dependency Check
-        continue-on-error: true
         run: |
-          echo "Running OWASP Dependency Check..."
           ./mvnw org.owasp:dependency-check-maven:check \
             -DfailBuildOnCVSS=7 \
-            -DsuppressionFiles=owasp-suppressions.xml || echo "OWASP check completed with warnings"
+            -DsuppressionFiles=owasp-suppressions.xml
 
       - name: Upload coverage to Codecov
         if: always()
