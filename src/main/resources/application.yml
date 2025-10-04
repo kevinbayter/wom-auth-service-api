@@ -140,7 +140,8 @@ springdoc:
   api-docs:
     path: /v3/api-docs
   swagger-ui:
-    path: /swagger-ui.html
+    path: /swagger-ui
+    enabled: true
     tags-sorter: alpha
     operations-sorter: alpha
   show-actuator: true
