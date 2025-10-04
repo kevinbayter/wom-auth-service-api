@@ -8,6 +8,8 @@
 
 ## 🚀 Estado del Proyecto
 
+[![Build Status](https://github.com/kevinbayter/wom-auth-service-api/actions/workflows/ci.yml/badge.svg)](https://github.com/kevinbayter/wom-auth-service-api/actions/workflows/ci.yml)
+
 🚧 **Terminado** - Prueba Técnica WOM
 
 ---
@@ -20,13 +22,13 @@
 4. [Instalación y Ejecución](#-instalación-y-ejecución)
    - [Opción 1: Docker Compose (Recomendado)](#opción-1-docker-compose-recomendado)
    - [Opción 2: Ejecución Local](#opción-2-ejecución-local)
-5. [Stack Tecnológico](#️-stack-tecnológico)
-6. [Arquitectura](#️-arquitectura)
+5. [Stack Tecnológico](#-stack-tecnológico)
+6. [Arquitectura](#-arquitectura)
    - [Diagrama de Arquitectura](#diagrama-de-arquitectura)
    - [Patrones de Diseño](#patrones-de-diseño)
    - [Principios SOLID](#principios-solid)
 7. [Requisitos Previos](#-requisitos-previos)
-8. [Configuración](#️-configuración)
+8. [Configuración](#-configuración)
 9. [API Endpoints](#-api-endpoints)
    - [Autenticación](#autenticación)
    - [Ejemplos de Uso con cURL](#ejemplos-de-uso-con-curl)
