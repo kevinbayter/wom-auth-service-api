@@ -5,6 +5,7 @@ import com.wom.auth.dto.LoginResponse;
 import com.wom.auth.dto.RefreshTokenRequest;
 import com.wom.auth.dto.UserResponse;
 import com.wom.auth.entity.User;
+import com.wom.auth.exception.UserNotFoundException;
 import com.wom.auth.service.AuthService;
 import com.wom.auth.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -79,7 +80,11 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Invalid or missing token")
     })
     @PostMapping("/logout")
-    public ResponseEntity<Map<String, String>> logout(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<Map<String, String>> logout(
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (authHeader == null || authHeader.isEmpty()) {
+            return ResponseEntity.ok(Map.of("message", "Already logged out"));
+        }
         String token = authHeader.substring(7);
         authService.logout(token);
         log.info("User logged out successfully");
@@ -96,7 +101,11 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Invalid or missing token")
     })
     @PostMapping("/logout-all")
-    public ResponseEntity<Map<String, String>> logoutAll(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<Map<String, String>> logoutAll(
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (authHeader == null || authHeader.isEmpty()) {
+            return ResponseEntity.ok(Map.of("message", "Already logged out"));
+        }
         String token = authHeader.substring(7);
         authService.logoutAllDevices(token);
         log.info("User logged out from all devices");
@@ -120,7 +129,7 @@ public class AuthController {
         String username = auth.getName();
         
         User user = userService.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         
         return ResponseEntity.ok(UserResponse.fromEntity(user));
     }
