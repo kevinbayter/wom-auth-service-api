@@ -1,4 +1,4 @@
-package com.wom.auth.integration;
+package com.wom.auth.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wom.auth.config.JpaAuditingConfig;
