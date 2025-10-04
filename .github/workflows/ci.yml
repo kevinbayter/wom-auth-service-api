@@ -87,11 +87,8 @@ jobs:
           SPRING_REDIS_PORT: 6379
         run: ./mvnw test -B
 
-      - name: Generate JaCoCo coverage report
-        run: ./mvnw jacoco:report
-
-      - name: Check code coverage (minimum 80%)
-        run: ./mvnw jacoco:check
+      - name: Verify coverage (minimum 80%)
+        run: ./mvnw verify -DskipTests -B
 
       - name: SonarQube Scan
         continue-on-error: true
