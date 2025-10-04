@@ -285,4 +285,91 @@ class UserServiceTest {
         assertTrue(testUser.getLastLoginAt().isBefore(LocalDateTime.now().plusSeconds(1)));
         verify(userRepository, times(1)).save(testUser);
     }
+
+    @Test
+    void createUser_WithValidData_ShouldCreateAndSaveUser() {
+        // Arrange
+        String email = "newuser@test.com";
+        String username = "newuser";
+        String password = "password123";
+        String fullName = "New User";
+        
+        when(userRepository.existsByEmail(email)).thenReturn(false);
+        when(userRepository.existsByUsername(username)).thenReturn(false);
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        User result = userService.createUser(email, username, password, fullName);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(email, result.getEmail());
+        assertEquals(username, result.getUsername());
+        assertEquals(fullName, result.getFullName());
+        assertNotNull(result.getPasswordHash());
+        verify(userRepository, times(1)).existsByEmail(email);
+        verify(userRepository, times(1)).existsByUsername(username);
+        verify(userRepository, times(1)).save(any(User.class));
+    }
+
+    @Test
+    void createUser_WithExistingEmail_ShouldThrowException() {
+        // Arrange
+        String email = "existing@test.com";
+        String username = "newuser";
+        String password = "password123";
+        String fullName = "New User";
+        
+        when(userRepository.existsByEmail(email)).thenReturn(true);
+
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> userService.createUser(email, username, password, fullName)
+        );
+        
+        assertEquals("Email already exists", exception.getMessage());
+        verify(userRepository, times(1)).existsByEmail(email);
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void createUser_WithExistingUsername_ShouldThrowException() {
+        // Arrange
+        String email = "newuser@test.com";
+        String username = "existinguser";
+        String password = "password123";
+        String fullName = "New User";
+        
+        when(userRepository.existsByEmail(email)).thenReturn(false);
+        when(userRepository.existsByUsername(username)).thenReturn(true);
+
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> userService.createUser(email, username, password, fullName)
+        );
+        
+        assertEquals("Username already exists", exception.getMessage());
+        verify(userRepository, times(1)).existsByEmail(email);
+        verify(userRepository, times(1)).existsByUsername(username);
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void incrementFailedAttempts_WhenReaches5Attempts_ShouldLockAccount() {
+        // Arrange
+        testUser.setFailedAttempts(4); // Ya tiene 4 intentos
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
+
+        // Act
+        userService.incrementFailedAttempts(testUser);
+
+        // Assert
+        assertEquals(5, testUser.getFailedAttempts());
+        assertTrue(testUser.isLocked());
+        assertNotNull(testUser.getLockedUntil());
+        verify(userRepository, times(1)).save(testUser);
+    }
 }
+
