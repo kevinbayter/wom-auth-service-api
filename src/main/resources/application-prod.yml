@@ -3,6 +3,20 @@ spring:
     activate:
       on-profile: prod
 
+  # Base de datos en producción (fly.io)
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  # Redis en producción (fly.io)
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    password: ${REDIS_PASSWORD}
+    ssl: true
+
   # JPA - Sin logs en producción
   jpa:
     show-sql: false
@@ -22,4 +36,4 @@ logging:
 management:
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: always

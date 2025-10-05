@@ -6,7 +6,7 @@
 
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/) [![Maven](https://img.shields.io/badge/Maven-3.8+-C71A36?logo=apache-maven&logoColor=white)](https://maven.apache.org/) [![Prometheus](https://img.shields.io/badge/Prometheus-Ready-E6522C?logo=prometheus&logoColor=white)](https://prometheus.io/) [![Grafana](https://img.shields.io/badge/Grafana-Compatible-F46800?logo=grafana&logoColor=white)](https://grafana.com/)
 
-[![Coverage](https://img.shields.io/badge/Coverage-87%25-brightgreen)](https://github.com/kevinbayter/wom-auth-service-api) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Fly.io](https://img.shields.io/badge/Fly.io-Deployed-blue)](https://fly.io) [![Coverage](https://img.shields.io/badge/Coverage-87%25-brightgreen)](https://github.com/kevinbayter/wom-auth-service-api) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ---
 
@@ -89,6 +89,12 @@ curl -X POST http://localhost:8080/auth/login \
 
 # ¡Listo! 🎉
 ```
+
+## 🌐 Backend en Producción
+
+El backend está desplegado en Fly.io y disponible en: [https://wom-auth-service-api.fly.dev/actuator/health](https://wom-auth-service-api.fly.dev/actuator/health)
+
+**Nota:** La primera petición puede tardar algunos segundos debido a que es un servicio serverless.
 
 ---
 ## 👥 Usuarios de Prueba
