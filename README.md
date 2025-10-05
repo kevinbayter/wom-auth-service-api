@@ -19,31 +19,32 @@
 
 1. [Descripción General](#-descripción-general)
 2. [Quick Start](#-quick-start)
-3. [Características Principales](#-características-principales)
-4. [Instalación y Ejecución](#-instalación-y-ejecución)
+3. [Usuarios de Prueba](#-usuarios-de-prueba)
+4. [Características Principales](#-características-principales)
+5. [Instalación y Ejecución](#-instalación-y-ejecución)
    - [Opción 1: Docker Compose (Recomendado)](#opción-1-docker-compose-recomendado)
    - [Opción 2: Ejecución Local](#opción-2-ejecución-local)
-5. [Stack Tecnológico](#-stack-tecnológico)
-6. [Arquitectura](#-arquitectura)
+6. [Stack Tecnológico](#-stack-tecnológico)
+7. [Arquitectura](#-arquitectura)
    - [Diagrama de Arquitectura](#diagrama-de-arquitectura)
    - [Patrones de Diseño](#patrones-de-diseño)
    - [Principios SOLID](#principios-solid)
-7. [Requisitos Previos](#-requisitos-previos)
-8. [Configuración](#-configuración)
-9. [API Endpoints](#-api-endpoints)
+8. [Requisitos Previos](#-requisitos-previos)
+9. [Configuración](#-configuración)
+10. [API Endpoints](#-api-endpoints)
    - [Autenticación](#autenticación)
    - [Ejemplos de Uso con cURL](#ejemplos-de-uso-con-curl)
-10. [Documentación Swagger](#-documentación-swagger)
-11. [Colección de Postman](#-colección-de-postman)
-12. [Testing](#-testing)
-13. [Monitoreo y Métricas](#-monitoreo-y-métricas)
-14. [Seguridad](#-seguridad)
-15. [CI/CD](#-cicd)
-16. [Estructura del Proyecto](#-estructura-del-proyecto)
-17. [Roadmap](#-roadmap)
-18. [Contribución](#-contribución)
-19. [Licencia](#-licencia)
-20. [Contacto](#-contacto)
+11. [Documentación Swagger](#-documentación-swagger)
+12. [Colección de Postman](#-colección-de-postman)
+13. [Testing](#-testing)
+14. [Monitoreo y Métricas](#-monitoreo-y-métricas)
+15. [Seguridad](#-seguridad)
+16. [CI/CD](#-cicd)
+17. [Estructura del Proyecto](#-estructura-del-proyecto)
+18. [Roadmap](#-roadmap)
+19. [Contribución](#-contribución)
+20. [Licencia](#-licencia)
+21. [Contacto](#-contacto)
 
 ---
 
@@ -88,6 +89,17 @@ curl -X POST http://localhost:8080/auth/login \
 
 # ¡Listo! 🎉
 ```
+
+---
+## 👥 Usuarios de Prueba
+
+Aquí los usuarios de prueba para interactuar con la API.
+
+| Tipo de Usuario | Email | Username | Password | Estado | Uso Recomendado |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Admin User** | `admin@test.com` | `admin` | `password` | ✅ ACTIVE | Usuario de prueba principal (no es "admin", solo se llama así) |
+| **Regular User**| `user@test.com` | `testuser` | `password` | ✅ ACTIVE | Para testing de funcionalidades normales de usuario. |
+| **Locked User** | `locked@test.com` | `lockeduser` | `password` | ❌ LOCKED | Para testing de manejo de cuentas bloqueadas. |
 
 ---
 
