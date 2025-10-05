@@ -26,6 +26,7 @@ public class AuditService {
 
     /**
      * Log a login attempt.
+     * Extracts request data on the calling thread before async execution.
      *
      * @param userId user ID (null if user not found)
      * @param identifier email or username used
@@ -33,14 +34,34 @@ public class AuditService {
      * @param reason failure reason (null if successful)
      * @param request HTTP request for IP and user agent
      */
-    @Async
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void logLoginAttempt(
             Long userId,
             String identifier,
             boolean success,
             String reason,
             HttpServletRequest request
+    ) {
+        // Extract request data on the request thread (before async boundary)
+        String ipAddress = getClientIp(request);
+        String userAgent = getUserAgent(request);
+        
+        // Pass immutable values to async method
+        logLoginAttemptAsync(userId, identifier, success, reason, ipAddress, userAgent);
+    }
+
+    /**
+     * Internal async method for login attempt logging.
+     * Receives immutable extracted values instead of HttpServletRequest.
+     */
+    @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    void logLoginAttemptAsync(
+            Long userId,
+            String identifier,
+            boolean success,
+            String reason,
+            String ipAddress,
+            String userAgent
     ) {
         try {
             String action = success ? AuditLog.Action.LOGIN_SUCCESS.name() : AuditLog.Action.LOGIN_FAILURE.name();
@@ -52,14 +73,14 @@ public class AuditService {
                     .result(result)
                     .identifier(identifier)
                     .reason(reason)
-                    .ipAddress(getClientIp(request))
-                    .userAgent(getUserAgent(request))
+                    .ipAddress(ipAddress)
+                    .userAgent(userAgent)
                     .build();
 
             auditLogRepository.save(auditLog);
 
             log.info("AUDIT_LOG | action={} | result={} | user_id={} | identifier={} | ip={} | reason={}",
-                    action, result, userId, identifier, getClientIp(request), reason);
+                    action, result, userId, identifier, ipAddress, reason);
         } catch (Exception e) {
             log.error("Failed to save audit log for login attempt", e);
         }
@@ -67,14 +88,28 @@ public class AuditService {
 
     /**
      * Log a logout event.
+     * Extracts request data on the calling thread before async execution.
      *
      * @param userId user ID
      * @param allDevices whether logout was for all devices
      * @param request HTTP request
      */
+    public void logLogout(Long userId, boolean allDevices, HttpServletRequest request) {
+        // Extract request data on the request thread (before async boundary)
+        String ipAddress = getClientIp(request);
+        String userAgent = getUserAgent(request);
+        
+        // Pass immutable values to async method
+        logLogoutAsync(userId, allDevices, ipAddress, userAgent);
+    }
+
+    /**
+     * Internal async method for logout logging.
+     * Receives immutable extracted values instead of HttpServletRequest.
+     */
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void logLogout(Long userId, boolean allDevices, HttpServletRequest request) {
+    void logLogoutAsync(Long userId, boolean allDevices, String ipAddress, String userAgent) {
         try {
             String action = allDevices ? AuditLog.Action.LOGOUT_ALL_DEVICES.name() : AuditLog.Action.LOGOUT.name();
 
@@ -82,14 +117,14 @@ public class AuditService {
                     .userId(userId)
                     .action(action)
                     .result(AuditLog.Result.SUCCESS.name())
-                    .ipAddress(getClientIp(request))
-                    .userAgent(getUserAgent(request))
+                    .ipAddress(ipAddress)
+                    .userAgent(userAgent)
                     .build();
 
             auditLogRepository.save(auditLog);
 
             log.info("AUDIT_LOG | action={} | result=SUCCESS | user_id={} | ip={}",
-                    action, userId, getClientIp(request));
+                    action, userId, ipAddress);
         } catch (Exception e) {
             log.error("Failed to save audit log for logout", e);
         }
@@ -97,19 +132,39 @@ public class AuditService {
 
     /**
      * Log a refresh token operation.
+     * Extracts request data on the calling thread before async execution.
      *
      * @param userId user ID
      * @param success whether refresh was successful
      * @param reason failure reason (null if successful)
      * @param request HTTP request
      */
-    @Async
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void logRefreshToken(
             Long userId,
             boolean success,
             String reason,
             HttpServletRequest request
+    ) {
+        // Extract request data on the request thread (before async boundary)
+        String ipAddress = getClientIp(request);
+        String userAgent = getUserAgent(request);
+        
+        // Pass immutable values to async method
+        logRefreshTokenAsync(userId, success, reason, ipAddress, userAgent);
+    }
+
+    /**
+     * Internal async method for refresh token logging.
+     * Receives immutable extracted values instead of HttpServletRequest.
+     */
+    @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    void logRefreshTokenAsync(
+            Long userId,
+            boolean success,
+            String reason,
+            String ipAddress,
+            String userAgent
     ) {
         try {
             String action = success ? AuditLog.Action.REFRESH_TOKEN_SUCCESS.name() : AuditLog.Action.REFRESH_TOKEN_FAILURE.name();
@@ -120,14 +175,14 @@ public class AuditService {
                     .action(action)
                     .result(result)
                     .reason(reason)
-                    .ipAddress(getClientIp(request))
-                    .userAgent(getUserAgent(request))
+                    .ipAddress(ipAddress)
+                    .userAgent(userAgent)
                     .build();
 
             auditLogRepository.save(auditLog);
 
             log.info("AUDIT_LOG | action={} | result={} | user_id={} | ip={} | reason={}",
-                    action, result, userId, getClientIp(request), reason);
+                    action, result, userId, ipAddress, reason);
         } catch (Exception e) {
             log.error("Failed to save audit log for refresh token", e);
         }
@@ -135,19 +190,39 @@ public class AuditService {
 
     /**
      * Log account locked event.
+     * Extracts request data on the calling thread before async execution.
      *
      * @param userId user ID
      * @param identifier email or username
      * @param reason lock reason
      * @param request HTTP request
      */
-    @Async
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void logAccountLocked(
             Long userId,
             String identifier,
             String reason,
             HttpServletRequest request
+    ) {
+        // Extract request data on the request thread (before async boundary)
+        String ipAddress = getClientIp(request);
+        String userAgent = getUserAgent(request);
+        
+        // Pass immutable values to async method
+        logAccountLockedAsync(userId, identifier, reason, ipAddress, userAgent);
+    }
+
+    /**
+     * Internal async method for account locked logging.
+     * Receives immutable extracted values instead of HttpServletRequest.
+     */
+    @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    void logAccountLockedAsync(
+            Long userId,
+            String identifier,
+            String reason,
+            String ipAddress,
+            String userAgent
     ) {
         try {
             AuditLog auditLog = AuditLog.builder()
@@ -156,14 +231,14 @@ public class AuditService {
                     .result(AuditLog.Result.SUCCESS.name())
                     .identifier(identifier)
                     .reason(reason)
-                    .ipAddress(getClientIp(request))
-                    .userAgent(getUserAgent(request))
+                    .ipAddress(ipAddress)
+                    .userAgent(userAgent)
                     .build();
 
             auditLogRepository.save(auditLog);
 
             log.warn("AUDIT_LOG | action=ACCOUNT_LOCKED | user_id={} | identifier={} | ip={} | reason={}",
-                    userId, identifier, getClientIp(request), reason);
+                    userId, identifier, ipAddress, reason);
         } catch (Exception e) {
             log.error("Failed to save audit log for account locked", e);
         }
