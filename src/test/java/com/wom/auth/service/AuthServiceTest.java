@@ -14,8 +14,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -41,11 +43,15 @@ class AuthServiceTest {
     @Mock
     private MetricsService metricsService;
 
+    @Mock
+    private AuditService auditService;
+
     @InjectMocks
     private AuthService authService;
 
     private User testUser;
     private RefreshToken testRefreshToken;
+    private HttpServletRequest mockRequest;
     private final String testEmail = "test@example.com";
     private final String testPassword = "password123";
     private final String testAccessToken = "access.token.jwt";
@@ -56,6 +62,11 @@ class AuthServiceTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(authService, "accessTokenExpiration", 900000L);
+        
+        // Create mock HTTP request
+        mockRequest = new MockHttpServletRequest();
+        ((MockHttpServletRequest) mockRequest).setRemoteAddr("127.0.0.1");
+        ((MockHttpServletRequest) mockRequest).addHeader("User-Agent", "Test User Agent");
         
         testUser = User.builder()
                 .id(testUserId)
@@ -97,7 +108,7 @@ class AuthServiceTest {
         when(tokenService.createRefreshToken(anyLong(), anyString())).thenReturn(testRefreshToken);
 
         // Act
-        LoginResponse response = authService.authenticate(testEmail, testPassword);
+        LoginResponse response = authService.authenticate(testEmail, testPassword, mockRequest);
 
         // Assert
         assertNotNull(response);
@@ -116,7 +127,7 @@ class AuthServiceTest {
 
         // Act & Assert
         assertThrows(InvalidCredentialsException.class, 
-                () -> authService.authenticate(testEmail, testPassword));
+                () -> authService.authenticate(testEmail, testPassword, mockRequest));
         verify(userService, never()).validatePassword(anyString(), anyString());
     }
 
@@ -129,7 +140,7 @@ class AuthServiceTest {
 
         // Act & Assert
         assertThrows(AccountLockedException.class, 
-                () -> authService.authenticate(testEmail, testPassword));
+                () -> authService.authenticate(testEmail, testPassword, mockRequest));
         verify(userService, never()).validatePassword(anyString(), anyString());
     }
 
@@ -143,7 +154,7 @@ class AuthServiceTest {
 
         // Act & Assert
         assertThrows(InvalidCredentialsException.class, 
-                () -> authService.authenticate(testEmail, testPassword));
+                () -> authService.authenticate(testEmail, testPassword, mockRequest));
         verify(userService, never()).validatePassword(anyString(), anyString());
     }
 
@@ -157,7 +168,7 @@ class AuthServiceTest {
 
         // Act & Assert
         assertThrows(InvalidCredentialsException.class, 
-                () -> authService.authenticate(testEmail, testPassword));
+                () -> authService.authenticate(testEmail, testPassword, mockRequest));
         verify(userService, times(1)).incrementFailedAttempts(testUser);
         verify(userService, never()).resetFailedAttempts(testUser);
     }
@@ -175,7 +186,7 @@ class AuthServiceTest {
         when(tokenService.createRefreshToken(anyLong(), anyString())).thenReturn(testRefreshToken);
 
         // Act
-        LoginResponse response = authService.refreshAccessToken(testRefreshTokenJwt);
+        LoginResponse response = authService.refreshAccessToken(testRefreshTokenJwt, mockRequest);
 
         // Assert
         assertNotNull(response);
@@ -192,7 +203,7 @@ class AuthServiceTest {
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class, 
-                () -> authService.refreshAccessToken(testRefreshTokenJwt));
+                () -> authService.refreshAccessToken(testRefreshTokenJwt, mockRequest));
         verify(jwtService, never()).generateAccessToken(anyLong(), anyString(), anyString());
     }
 
@@ -207,7 +218,7 @@ class AuthServiceTest {
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class, 
-                () -> authService.refreshAccessToken(testRefreshTokenJwt));
+                () -> authService.refreshAccessToken(testRefreshTokenJwt, mockRequest));
         verify(jwtService, never()).generateAccessToken(anyLong(), anyString(), anyString());
     }
 
@@ -220,7 +231,7 @@ class AuthServiceTest {
         when(jwtService.generateRefreshToken(anyLong(), anyString())).thenReturn(testRefreshTokenJwt);
 
         // Act
-        authService.logout(testAccessToken);
+        authService.logout(testAccessToken, mockRequest);
 
         // Assert
         verify(tokenService, times(1)).blacklistAccessToken(eq(testAccessToken), anyLong());
@@ -236,7 +247,7 @@ class AuthServiceTest {
         when(jwtService.generateRefreshToken(anyLong(), anyString())).thenReturn(testRefreshTokenJwt);
 
         // Act
-        authService.logout(testAccessToken);
+        authService.logout(testAccessToken, mockRequest);
 
         // Assert
         verify(tokenService, never()).blacklistAccessToken(anyString(), anyLong());
@@ -246,14 +257,14 @@ class AuthServiceTest {
     @Test
     void logout_WithNullToken_ShouldNotThrowException() {
         // Act & Assert
-        assertDoesNotThrow(() -> authService.logout(null));
+        assertDoesNotThrow(() -> authService.logout(null, mockRequest));
         verify(tokenService, never()).blacklistAccessToken(anyString(), anyLong());
     }
 
     @Test
     void logout_WithEmptyToken_ShouldNotThrowException() {
         // Act & Assert
-        assertDoesNotThrow(() -> authService.logout(""));
+        assertDoesNotThrow(() -> authService.logout("", mockRequest));
         verify(tokenService, never()).blacklistAccessToken(anyString(), anyLong());
     }
 
@@ -264,7 +275,7 @@ class AuthServiceTest {
         when(jwtService.isTokenExpired(testAccessToken)).thenReturn(false);
 
         // Act
-        authService.logoutAllDevices(testAccessToken);
+        authService.logoutAllDevices(testAccessToken, mockRequest);
 
         // Assert
         verify(tokenService, times(1)).revokeAllUserTokens(testUserId);
@@ -278,7 +289,7 @@ class AuthServiceTest {
         when(jwtService.isTokenExpired(testAccessToken)).thenReturn(true);
 
         // Act
-        authService.logoutAllDevices(testAccessToken);
+        authService.logoutAllDevices(testAccessToken, mockRequest);
 
         // Assert
         verify(tokenService, times(1)).revokeAllUserTokens(testUserId);

@@ -865,6 +865,256 @@ chmod +x test-api.sh
 
 ---
 
+### 🧪 Suite Completa de Pruebas
+
+A continuación se muestra un script completo para probar todas las funcionalidades del servicio, incluyendo el nuevo sistema de auditoría:
+
+```bash
+#!/bin/bash
+
+echo "=========================================="
+echo "WOM Auth Service API - Prueba de Endpoints"
+echo "=========================================="
+echo ""
+
+# 1. Login exitoso
+echo "1️⃣  LOGIN EXITOSO"
+echo "-------------------"
+RESPONSE=$(curl -s -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"identifier":"admin@test.com","password":"password"}')
+
+ACCESS_TOKEN=$(echo $RESPONSE | jq -r '.accessToken')
+REFRESH_TOKEN=$(echo $RESPONSE | jq -r '.refreshToken')
+
+echo "✅ Login exitoso"
+echo "Access Token: ${ACCESS_TOKEN:0:50}..."
+echo "Refresh Token: ${REFRESH_TOKEN:0:50}..."
+echo ""
+
+# 2. Obtener usuario actual
+echo "2️⃣  GET /auth/me - Usuario Actual"
+echo "-----------------------------------"
+curl -s -X GET http://localhost:8080/auth/me \
+  -H "Authorization: Bearer $ACCESS_TOKEN" | jq .
+echo ""
+
+# 3. Refresh Token
+echo "3️⃣  POST /auth/refresh - Renovar Tokens"
+echo "-----------------------------------------"
+REFRESH_RESPONSE=$(curl -s -X POST http://localhost:8080/auth/refresh \
+  -H "Content-Type: application/json" \
+  -d "{\"refreshToken\":\"$REFRESH_TOKEN\"}")
+
+NEW_ACCESS_TOKEN=$(echo $REFRESH_RESPONSE | jq -r '.accessToken')
+echo "✅ Tokens renovados"
+echo "Nuevo Access Token: ${NEW_ACCESS_TOKEN:0:50}..."
+echo ""
+
+# 4. Login con credenciales inválidas (prueba de auditoría)
+echo "4️⃣  LOGIN CON CREDENCIALES INVÁLIDAS"
+echo "--------------------------------------"
+curl -s -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"identifier":"admin@test.com","password":"wrongpassword"}' | jq .
+echo ""
+
+# 5. Probar Rate Limiting (múltiples requests)
+echo "5️⃣  RATE LIMITING - Múltiples Intentos Fallidos"
+echo "--------------------------------------------------"
+for i in {1..5}; do
+  echo "Intento $i:"
+  curl -s -X POST http://localhost:8080/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"identifier":"test@test.com","password":"wrong"}' \
+    -w "\nHTTP Status: %{http_code}\n" -o /dev/null
+done
+echo ""
+
+# 6. Logout
+echo "6️⃣  POST /auth/logout - Cerrar Sesión"
+echo "---------------------------------------"
+curl -s -X POST http://localhost:8080/auth/logout \
+  -H "Authorization: Bearer $ACCESS_TOKEN" | jq .
+echo ""
+
+# 7. Intentar usar token después del logout
+echo "7️⃣  Intentar usar token después de logout"
+echo "--------------------------------------------"
+curl -s -X GET http://localhost:8080/auth/me \
+  -H "Authorization: Bearer $ACCESS_TOKEN" | jq .
+echo ""
+
+# 8. Nuevo login para logout-all
+echo "8️⃣  Nuevo Login para probar logout-all"
+echo "-----------------------------------------"
+RESPONSE2=$(curl -s -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"identifier":"testuser","password":"password"}')
+
+ACCESS_TOKEN2=$(echo $RESPONSE2 | jq -r '.accessToken')
+echo "✅ Login exitoso con testuser"
+echo ""
+
+# 9. Logout All Devices
+echo "9️⃣  POST /auth/logout-all - Cerrar en todos los dispositivos"
+echo "---------------------------------------------------------------"
+curl -s -X POST http://localhost:8080/auth/logout-all \
+  -H "Authorization: Bearer $ACCESS_TOKEN2" | jq .
+echo ""
+
+# 10. Health Check
+echo "🔟 GET /actuator/health - Health Check"
+echo "----------------------------------------"
+curl -s http://localhost:8080/actuator/health | jq .
+echo ""
+
+echo "=========================================="
+echo "✅ Pruebas completadas"
+echo "=========================================="
+```
+
+**Resultado esperado de las pruebas:**
+
+```
+1️⃣  LOGIN EXITOSO
+-------------------
+✅ Login exitoso
+Access Token: eyJhbGciOiJSUzI1NiJ9...
+Refresh Token: eyJhbGciOiJSUzI1NiJ9...
+
+2️⃣  GET /auth/me - Usuario Actual
+-----------------------------------
+{
+  "id": 1,
+  "email": "admin@test.com",
+  "username": "admin",
+  "fullName": "admin",
+  "status": "ACTIVE",
+  "lastLoginAt": "2025-10-05T05:48:07.020743",
+  "createdAt": "2025-10-04T07:26:41.896077"
+}
+
+3️⃣  POST /auth/refresh - Renovar Tokens
+-----------------------------------------
+✅ Tokens renovados
+Nuevo Access Token: eyJhbGciOiJSUzI1NiJ9...
+
+4️⃣  LOGIN CON CREDENCIALES INVÁLIDAS
+--------------------------------------
+{
+  "path": "/auth/login",
+  "error": "Unauthorized",
+  "message": "Invalid credentials",
+  "timestamp": "2025-10-05T05:48:07.21908672",
+  "status": 401
+}
+
+5️⃣  RATE LIMITING - Múltiples Intentos Fallidos
+--------------------------------------------------
+Intento 1:
+HTTP Status: 400
+Intento 2:
+HTTP Status: 400
+...
+
+6️⃣  POST /auth/logout - Cerrar Sesión
+---------------------------------------
+{
+  "message": "Logged out successfully"
+}
+
+7️⃣  Intentar usar token después de logout
+--------------------------------------------
+{
+  "path": "/auth/me",
+  "error": "Unauthorized",
+  "message": "Token has been revoked",
+  "status": 401
+}
+
+8️⃣  Nuevo Login para probar logout-all
+-----------------------------------------
+✅ Login exitoso con testuser
+
+9️⃣  POST /auth/logout-all - Cerrar en todos los dispositivos
+---------------------------------------------------------------
+{
+  "message": "Logged out from all devices"
+}
+
+🔟 GET /actuator/health - Health Check
+----------------------------------------
+{
+  "status": "UP",
+  "components": {
+    "db": { "status": "UP" },
+    "redis": { "status": "UP" },
+    "postgres": { "status": "UP" }
+  }
+}
+
+✅ Pruebas completadas
+```
+
+### 📊 Verificación del Sistema de Auditoría
+
+Todos los eventos de autenticación son registrados automáticamente en la tabla `audit_log`. Para verificar:
+
+```bash
+# Conectar a PostgreSQL
+docker exec -it wom-auth-postgres psql -U wom_user -d wom_auth_db
+
+# Consultar registros de auditoría
+SELECT 
+  id, 
+  user_id, 
+  action, 
+  result, 
+  identifier, 
+  ip_address, 
+  reason, 
+  created_at 
+FROM audit_log 
+ORDER BY created_at DESC 
+LIMIT 10;
+```
+
+**Ejemplo de salida:**
+
+```
+ id | user_id |       action       | result  |    identifier    |  ip_address  |      reason       |         created_at         
+----+---------+--------------------+---------+------------------+--------------+-------------------+----------------------------
+  9 |       2 | LOGOUT_ALL_DEVICES | SUCCESS |                  | 192.168.65.1 |                   | 2025-10-05 05:48:07.42031
+  8 |       2 | LOGIN_SUCCESS      | SUCCESS | testuser         | 192.168.65.1 |                   | 2025-10-05 05:48:07.397285
+  7 |       1 | LOGOUT             | SUCCESS |                  | 192.168.65.1 |                   | 2025-10-05 05:48:07.310561
+  6 |       1 | LOGIN_FAILURE      | FAILURE | admin@test.com   | 192.168.65.1 | Invalid password  | 2025-10-05 05:48:07.218972
+  5 |       1 | LOGIN_SUCCESS      | SUCCESS | admin@test.com   | 192.168.65.1 |                   | 2025-10-05 05:48:07.035568
+  4 |       1 | LOGIN_SUCCESS      | SUCCESS | admin@test.com   | 192.168.65.1 |                   | 2025-10-05 05:47:44.09198
+  3 |       2 | LOGIN_FAILURE      | FAILURE | testuser         | 192.168.65.1 | Invalid password  | 2025-10-05 05:47:27.523082
+  2 |       1 | LOGIN_FAILURE      | FAILURE | admin@test.com   | 192.168.65.1 | Invalid password  | 2025-10-05 05:47:08.51776
+  1 |    NULL | LOGIN_FAILURE      | FAILURE | john@example.com | 192.168.65.1 | User not found    | 2025-10-05 05:45:57.041206
+```
+
+**Tipos de eventos auditados:**
+
+- ✅ `LOGIN_SUCCESS` - Login exitoso
+- ❌ `LOGIN_FAILURE` - Intento fallido (con razón: Invalid password, User not found, Account locked)
+- 🔄 `REFRESH_TOKEN` - Renovación de token
+- 🚪 `LOGOUT` - Cierre de sesión individual
+- 🚪 `LOGOUT_ALL_DEVICES` - Cierre de sesión en todos los dispositivos
+- 🔒 `ACCOUNT_LOCKED` - Cuenta bloqueada por intentos fallidos
+
+**Características del sistema de auditoría:**
+
+- 📝 **Registro asíncrono** - No impacta el rendimiento de las operaciones
+- 🌐 **Captura de IP real** - Soporta headers `X-Forwarded-For` y `X-Real-IP`
+- 🔍 **Trazabilidad completa** - User ID, acción, resultado, IP, User-Agent, timestamp
+- 📊 **Análisis de seguridad** - Permite detectar patrones de ataque y comportamientos sospechosos
+- ⚡ **Alto rendimiento** - Procesamiento en background sin bloquear requests
+
+---
+
 ## 📚 Documentación Swagger
 
 ### Acceso a Swagger UI

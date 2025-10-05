@@ -22,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Map;
 
@@ -47,9 +48,11 @@ public class AuthController {
             @ApiResponse(responseCode = "429", description = "Too many requests - rate limit exceeded")
     })
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(
+            @Valid @RequestBody LoginRequest request,
+            HttpServletRequest httpRequest) {
         log.info("Login attempt for identifier: {}", request.getIdentifier());
-        LoginResponse response = authService.authenticate(request.getIdentifier(), request.getPassword());
+        LoginResponse response = authService.authenticate(request.getIdentifier(), request.getPassword(), httpRequest);
         return ResponseEntity.ok(response);
     }
 
@@ -64,9 +67,11 @@ public class AuthController {
             @ApiResponse(responseCode = "429", description = "Too many requests - rate limit exceeded")
     })
     @PostMapping("/refresh")
-    public ResponseEntity<LoginResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<LoginResponse> refresh(
+            @Valid @RequestBody RefreshTokenRequest request,
+            HttpServletRequest httpRequest) {
         log.debug("Token refresh requested");
-        LoginResponse response = authService.refreshAccessToken(request.getRefreshToken());
+        LoginResponse response = authService.refreshAccessToken(request.getRefreshToken(), httpRequest);
         return ResponseEntity.ok(response);
     }
 
@@ -81,12 +86,13 @@ public class AuthController {
     })
     @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logout(
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            HttpServletRequest httpRequest) {
         if (authHeader == null || authHeader.isEmpty()) {
             return ResponseEntity.ok(Map.of("message", "Already logged out"));
         }
         String token = authHeader.substring(7);
-        authService.logout(token);
+        authService.logout(token, httpRequest);
         log.info("User logged out successfully");
         return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
@@ -102,12 +108,13 @@ public class AuthController {
     })
     @PostMapping("/logout-all")
     public ResponseEntity<Map<String, String>> logoutAll(
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            HttpServletRequest httpRequest) {
         if (authHeader == null || authHeader.isEmpty()) {
             return ResponseEntity.ok(Map.of("message", "Already logged out"));
         }
         String token = authHeader.substring(7);
-        authService.logoutAllDevices(token);
+        authService.logoutAllDevices(token, httpRequest);
         log.info("User logged out from all devices");
         return ResponseEntity.ok(Map.of("message", "Logged out from all devices"));
     }

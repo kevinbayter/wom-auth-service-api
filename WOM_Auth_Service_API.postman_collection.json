@@ -715,6 +715,254 @@
 				}
 			],
 			"description": "Casos de error para validar el manejo de excepciones.\n\n**Incluye:**\n- Login con credenciales incorrectas\n- Acceso sin autenticación\n- Refresh con token inválido"
+		},
+		{
+			"name": "Audit System",
+			"item": [
+				{
+					"name": "Query Audit Logs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validar que la consulta SQL se ejecute correctamente",
+									"pm.test(\"Query executed successfully\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"console.log(\"📊 Audit logs retrieved successfully\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/actuator/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actuator",
+								"health"
+							]
+						},
+						"description": "**Consulta de logs de auditoría**\n\nPara consultar los registros de auditoría, conectarse directamente a PostgreSQL:\n\n```bash\ndocker exec -it wom-auth-postgres psql -U wom_user -d wom_auth_db\n```\n\n**Query SQL:**\n```sql\nSELECT \n  id, \n  user_id, \n  action, \n  result, \n  identifier, \n  ip_address, \n  reason, \n  created_at \nFROM audit_log \nORDER BY created_at DESC \nLIMIT 20;\n```\n\n**Eventos auditados:**\n- `LOGIN_SUCCESS` - Login exitoso\n- `LOGIN_FAILURE` - Intento fallido (con razón)\n- `REFRESH_TOKEN` - Renovación de token\n- `LOGOUT` - Cierre de sesión\n- `LOGOUT_ALL_DEVICES` - Cierre en todos los dispositivos\n- `ACCOUNT_LOCKED` - Cuenta bloqueada\n\n**Campos importantes:**\n- `user_id`: ID del usuario (NULL si no se encontró)\n- `action`: Tipo de acción\n- `result`: SUCCESS o FAILURE\n- `identifier`: Email/username usado\n- `ip_address`: IP real (incluye X-Forwarded-For)\n- `reason`: Razón del fallo (si aplica)\n- `user_agent`: Navegador/cliente usado"
+					},
+					"response": []
+				},
+				{
+					"name": "Trigger Login Success Audit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validar login exitoso",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Login successful - Audit log created\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('accessToken');",
+									"});",
+									"",
+									"console.log(\"✅ LOGIN_SUCCESS audit log created\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"identifier\": \"admin@test.com\",\n  \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Genera un evento de auditoría `LOGIN_SUCCESS`.\n\n**Registro esperado en audit_log:**\n- action: LOGIN_SUCCESS\n- result: SUCCESS\n- user_id: 1\n- identifier: admin@test.com\n- ip_address: (tu IP)\n- reason: null"
+					},
+					"response": []
+				},
+				{
+					"name": "Trigger Login Failure Audit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validar error 401",
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"console.log(\"❌ LOGIN_FAILURE audit log created\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"identifier\": \"admin@test.com\",\n  \"password\": \"wrongpassword\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Genera un evento de auditoría `LOGIN_FAILURE`.\n\n**Registro esperado en audit_log:**\n- action: LOGIN_FAILURE\n- result: FAILURE\n- user_id: 1\n- identifier: admin@test.com\n- ip_address: (tu IP)\n- reason: Invalid password"
+					},
+					"response": []
+				},
+				{
+					"name": "Trigger Logout Audit",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Asegurar que tengamos un token válido",
+									"if (!pm.environment.get(\"access_token\")) {",
+									"    console.log(\"⚠️ No access token found. Please run '1. Login' first.\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validar logout exitoso",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"console.log(\"✅ LOGOUT audit log created\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Genera un evento de auditoría `LOGOUT`.\n\n**Registro esperado en audit_log:**\n- action: LOGOUT\n- result: SUCCESS\n- user_id: (del token)\n- identifier: null\n- ip_address: (tu IP)\n- reason: null"
+					},
+					"response": []
+				},
+				{
+					"name": "Trigger Logout All Devices Audit",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Asegurar que tengamos un token válido",
+									"if (!pm.environment.get(\"access_token\")) {",
+									"    console.log(\"⚠️ No access token found. Please run '1. Login' first.\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validar logout exitoso",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"console.log(\"✅ LOGOUT_ALL_DEVICES audit log created\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/logout-all",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout-all"
+							]
+						},
+						"description": "Genera un evento de auditoría `LOGOUT_ALL_DEVICES`.\n\n**Registro esperado en audit_log:**\n- action: LOGOUT_ALL_DEVICES\n- result: SUCCESS\n- user_id: (del token)\n- identifier: null\n- ip_address: (tu IP)\n- reason: null"
+					},
+					"response": []
+				}
+			],
+			"description": "**Sistema de Auditoría Completo**\n\nTodos los eventos de autenticación son registrados automáticamente en la tabla `audit_log` de PostgreSQL.\n\n**Características:**\n- ✅ Registro asíncrono (no bloquea requests)\n- ✅ Captura de IP real (X-Forwarded-For, X-Real-IP)\n- ✅ Trazabilidad completa (user_id, action, result, IP, user_agent, timestamp)\n- ✅ Análisis de seguridad (detecta patrones de ataque)\n- ✅ Alto rendimiento (procesamiento en background)\n\n**Eventos auditados:**\n1. LOGIN_SUCCESS - Login exitoso\n2. LOGIN_FAILURE - Intento fallido (con razón específica)\n3. REFRESH_TOKEN - Renovación de token\n4. LOGOUT - Cierre de sesión individual\n5. LOGOUT_ALL_DEVICES - Cierre en todos los dispositivos\n6. ACCOUNT_LOCKED - Cuenta bloqueada por intentos fallidos\n\n**Cómo consultar los logs:**\n\nConectarse a PostgreSQL:\n```bash\ndocker exec -it wom-auth-postgres psql -U wom_user -d wom_auth_db\n```\n\nConsultar últimos 20 eventos:\n```sql\nSELECT id, user_id, action, result, identifier, ip_address, reason, created_at \nFROM audit_log \nORDER BY created_at DESC \nLIMIT 20;\n```\n\nFiltrar intentos fallidos:\n```sql\nSELECT * FROM audit_log \nWHERE result = 'FAILURE' \nORDER BY created_at DESC;\n```\n\nDetectar patrones de ataque (múltiples fallos):\n```sql\nSELECT ip_address, COUNT(*) as attempts \nFROM audit_log \nWHERE action = 'LOGIN_FAILURE' \nAND created_at > NOW() - INTERVAL '1 hour' \nGROUP BY ip_address \nHAVING COUNT(*) > 5 \nORDER BY attempts DESC;\n```"
 		}
 	],
 	"event": [
