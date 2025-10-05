@@ -30,6 +30,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -86,6 +87,9 @@ class AuthControllerTest {
     @MockBean
     private UserService userService;
 
+    @MockBean
+    private com.wom.auth.service.AuditService auditService;
+
     // ============================================================
     // POST /auth/login - Login endpoint tests
     // ============================================================
@@ -102,7 +106,7 @@ class AuthControllerTest {
         response.setRefreshToken("refresh-token-456");
         response.setExpiresIn(900000L);
 
-        when(authService.authenticate(anyString(), anyString())).thenReturn(response);
+        when(authService.authenticate(anyString(), anyString(), any(HttpServletRequest.class))).thenReturn(response);
 
         // Act & Assert
         mockMvc.perform(post("/auth/login")
@@ -121,7 +125,7 @@ class AuthControllerTest {
         request.setIdentifier("wronguser");
         request.setPassword("WrongPass123!");
 
-        when(authService.authenticate(anyString(), anyString()))
+        when(authService.authenticate(anyString(), anyString(), any(HttpServletRequest.class)))
                 .thenThrow(new InvalidCredentialsException("Invalid credentials"));
 
         // Act & Assert
@@ -140,7 +144,7 @@ class AuthControllerTest {
         request.setPassword("ValidPass123!");
 
         LocalDateTime lockedUntil = LocalDateTime.now().plusHours(1);
-        when(authService.authenticate(anyString(), anyString()))
+        when(authService.authenticate(anyString(), anyString(), any(HttpServletRequest.class)))
                 .thenThrow(new AccountLockedException("Account is locked", lockedUntil));
 
         // Act & Assert
@@ -217,7 +221,7 @@ class AuthControllerTest {
         response.setRefreshToken("new-refresh-token");
         response.setExpiresIn(900000L);
 
-        when(authService.refreshAccessToken(anyString())).thenReturn(response);
+        when(authService.refreshAccessToken(anyString(), any(HttpServletRequest.class))).thenReturn(response);
 
         // Act & Assert
         mockMvc.perform(post("/auth/refresh")
@@ -234,7 +238,7 @@ class AuthControllerTest {
         RefreshTokenRequest request = new RefreshTokenRequest();
         request.setRefreshToken("invalid-token");
 
-        when(authService.refreshAccessToken(anyString()))
+        when(authService.refreshAccessToken(anyString(), any(HttpServletRequest.class)))
                 .thenThrow(new InvalidTokenException("Invalid refresh token"));
 
         // Act & Assert
